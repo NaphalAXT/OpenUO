@@ -17,11 +17,40 @@ namespace OpenUO.Ultima
 	public enum ClientLocalizationLanguage
 	{
 		NULL,
+
+		/// <summary>
+		///     English
+		/// </summary>
 		ENU,
+
+		/// <summary>
+		///     German
+		/// </summary>
 		DEU,
+
+		/// <summary>
+		///     Spanish
+		/// </summary>
 		ESP,
+
+		/// <summary>
+		///     French
+		/// </summary>
 		FRA,
+
+		/// <summary>
+		///     Japanese
+		/// </summary>
 		JPN,
-		KOR
+
+		/// <summary>
+		///     Korean
+		/// </summary>
+		KOR,
+
+		/// <summary>
+		///     Chinese
+		/// </summary>
+		CHT
 	}
 }

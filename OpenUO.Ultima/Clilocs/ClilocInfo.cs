@@ -23,18 +23,17 @@ namespace OpenUO.Ultima
 	{
 		public static readonly Regex VarPattern = new Regex(@"(~(\d+)_(\w+)~)", RegexOptions.IgnoreCase);
 
+		public ClientLocalizationLanguage Language { get; protected set; }
+
+		public int Index { get; protected set; }
+		public string Text { get; protected set; }
+
 		public ClilocInfo(ClientLocalizationLanguage lng, int index, string text)
 		{
 			Language = lng;
 			Index = index;
 			Text = text;
 		}
-
-		public ClientLocalizationLanguage Language { get; protected set; }
-
-		public int Index { get; protected set; }
-
-		public string Text { get; protected set; }
 
 		public override string ToString()
 		{
@@ -75,7 +74,7 @@ namespace OpenUO.Ultima
 				match = match.NextMatch();
 			}
 
-			return text.Trim();
+			return text != null ? text.Trim() : String.Empty;
 		}
 	}
 }

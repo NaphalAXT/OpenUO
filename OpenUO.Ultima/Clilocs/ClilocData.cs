@@ -24,6 +24,14 @@ namespace OpenUO.Ultima
 {
 	public class LocalizationEntry
 	{
+		public ClientLocalizationLanguage Language { get; protected set; }
+
+		public int Index { get; protected set; }
+		public long Offset { get; protected set; }
+		public long Length { get; protected set; }
+
+		protected ClilocInfo Info { get; set; }
+
 		public LocalizationEntry(ClientLocalizationLanguage lng, int index, long offset, long length)
 		{
 			Language = lng;
@@ -31,16 +39,6 @@ namespace OpenUO.Ultima
 			Offset = offset;
 			Length = length;
 		}
-
-		public ClientLocalizationLanguage Language { get; protected set; }
-
-		public int Index { get; protected set; }
-
-		public long Offset { get; protected set; }
-
-		public long Length { get; protected set; }
-
-		protected ClilocInfo Info { get; set; }
 
 		public virtual void Clear()
 		{
@@ -58,10 +56,7 @@ namespace OpenUO.Ultima
 				data[i] = bin.ReadByte();
 			}
 
-			Info = new ClilocInfo(Language, Index, Encoding.UTF8.GetString(data));
-			data = null;
-
-			return Info;
+			return Info = new ClilocInfo(Language, Index, Encoding.UTF8.GetString(data));
 		}
 
 		public ClilocInfo Lookup(FileInfo file, bool forceUpdate = false)

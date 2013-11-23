@@ -33,7 +33,6 @@ namespace OpenUO.Ultima
 		public virtual FileInfo InputFile { get; protected set; }
 
 		public int Count { get { return _table.Count; } }
-
 		public bool Loaded { get; private set; }
 
 		public ClilocInfo this[int index] { get { return Lookup(index); } }
