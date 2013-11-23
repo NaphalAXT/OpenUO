@@ -17,40 +17,43 @@
  ********************************************************/
 #endregion
 
+#region References
 using System;
+using System.Globalization;
 using System.Windows.Data;
+#endregion
 
 namespace OpenUO.Core.PresentationFramework.Converters
 {
-    public class StringLengthConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            if (value == null)
-            {
-                return string.Empty;
-            }
+	public class StringLengthConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			if (value == null)
+			{
+				return string.Empty;
+			}
 
-            string s = value.ToString();
-            int length = 100;
-            int outLength;
+			string s = value.ToString();
+			int length = 100;
+			int outLength;
 
-            if (parameter != null && int.TryParse(parameter.ToString(), out outLength))
-            {
-                length = outLength;
-            }
+			if (parameter != null && int.TryParse(parameter.ToString(), out outLength))
+			{
+				length = outLength;
+			}
 
-            if (s.Length <= length)
-            {
-                return s;
-            }
+			if (s.Length <= length)
+			{
+				return s;
+			}
 
-            return string.Concat(s.Substring(0, length - 3), "...");
-        }
+			return string.Concat(s.Substring(0, length - 3), "...");
+		}
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }

@@ -17,22 +17,24 @@
  ********************************************************/
 #endregion
 
+#region References
 using System;
 using System.Globalization;
 using System.Windows.Data;
+#endregion
 
 namespace OpenUO.Core.PresentationFramework.Converters
 {
-    public sealed class HasValueConverter : IValueConverter
-    {
-        public object Convert(object value, Type typeTarget, object parameter, CultureInfo culture)
-        {
-            return ((value != null) && (value.ToString().Trim() != string.Empty));
-        }
+	public sealed class HasValueConverter : IValueConverter
+	{
+		public object Convert(object value, Type typeTarget, object parameter, CultureInfo culture)
+		{
+			return ((value != null) && (value.ToString().Trim() != string.Empty));
+		}
 
-        public object ConvertBack(object value, Type typeTarget, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
+		public object ConvertBack(object value, Type typeTarget, object parameter, CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }

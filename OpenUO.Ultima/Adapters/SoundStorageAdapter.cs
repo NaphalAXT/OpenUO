@@ -1,5 +1,4 @@
 ﻿#region License Header
-
 // /***************************************************************************
 //  *   Copyright (c) 2011 OpenUO Software Team.
 //  *   All Right Reserved.
@@ -11,82 +10,78 @@
 //  *   the Free Software Foundation; either version 3 of the License, or
 //  *   (at your option) any later version.
 //  ***************************************************************************/
-
 #endregion
 
-#region Usings
-
+#region References
 using System;
 using System.IO;
 using System.Text;
-
 #endregion
 
 namespace OpenUO.Ultima.Adapters
 {
-    public class SoundStorageAdapter : StorageAdapterBase, ISoundStorageAdapter<Sound>
-    {
-        private FileIndexBase _fileIndex;
+	public class SoundStorageAdapter : StorageAdapterBase, ISoundStorageAdapter<Sound>
+	{
+		private FileIndexBase _fileIndex;
 
-        public override int Length
-        {
-            get
-            {
-                if (!IsInitialized)
-                {
-                    Initialize();
-                }
+		public override int Length
+		{
+			get
+			{
+				if (!IsInitialized)
+				{
+					Initialize();
+				}
 
-                return _fileIndex.Length;
-            }
-        }
+				return _fileIndex.Length;
+			}
+		}
 
-        public override void Initialize()
-        {
-            base.Initialize();
+		public override void Initialize()
+		{
+			base.Initialize();
 
-            InstallLocation install = Install;
+			InstallLocation install = Install;
 
-            _fileIndex =
-                install.IsUOPFormat
-                    ? install.CreateFileIndex("soundLegacyMUL.uop", 0xFFF, false, ".dat")
-                    : install.CreateFileIndex("soundidx.mul", "sound..mul");
-        }
+			_fileIndex = install.IsUOPFormat
+							 ? install.CreateFileIndex("soundLegacyMUL.uop", 0xFFF, false, ".dat")
+							 : install.CreateFileIndex("soundidx.mul", "sound..mul");
+		}
 
-        public Sound GetSound(int index)
-        {
-            int length, extra;
-            Stream stream = _fileIndex.Seek(index, out length, out extra);
+		public Sound GetSound(int index)
+		{
+			int length, extra;
+			Stream stream = _fileIndex.Seek(index, out length, out extra);
 
-            if (stream == null)
-            {
-                return null;
-            }
+			if (stream == null)
+			{
+				return null;
+			}
 
-            int[] waveHeader = CreateWaveHeader(length);
+			var waveHeader = CreateWaveHeader(length);
 
-            length -= 40;
+			length -= 40;
 
-            int headerLength = (waveHeader.Length << 2);
+			int headerLength = (waveHeader.Length << 2);
 
-            byte[] stringBuffer = new byte[40];
-            byte[] buffer = new byte[length + headerLength];
+			var stringBuffer = new byte[40];
+			var buffer = new byte[length + headerLength];
 
-            Buffer.BlockCopy(waveHeader, 0, buffer, 0, headerLength);
+			Buffer.BlockCopy(waveHeader, 0, buffer, 0, headerLength);
 
-            stream.Read(stringBuffer, 0, 40);
-            stream.Read(buffer, headerLength, length);
+			stream.Read(stringBuffer, 0, 40);
+			stream.Read(buffer, headerLength, length);
 
-            string name = Encoding.ASCII.GetString(stringBuffer).Trim();
-            int end = name.IndexOf("\0");
-            name = name.Substring(0, end);
+			string name = Encoding.ASCII.GetString(stringBuffer).Trim();
+			int end = name.IndexOf("\0");
+			name = name.Substring(0, end);
 
-            return new Sound(name, new MemoryStream(buffer));
-        }
+			return new Sound(name, new MemoryStream(buffer));
+		}
 
-        private static int[] CreateWaveHeader(int length)
-        {
-            /* ====================
+		private static int[] CreateWaveHeader(int length)
+		{
+			/* ====================
              * = WAVE File layout =
              * ====================
              * char[4] = 'RIFF' \
@@ -105,7 +100,11 @@ namespace OpenUO.Ultima.Adapters
              * short[..] - data /
              * ====================
              * */
-            return new[] {0x46464952, (length + 12), 0x45564157, 0x20746D66, 0x10, 0x010001, 0x5622, 0xAC44, 0x100002, 0x61746164, (length - 24)};
-        }
-    }
+			return new[]
+			{
+				0x46464952, (length + 12), 0x45564157, 0x20746D66, 0x10, 0x010001, 0x5622, 0xAC44, 0x100002, 0x61746164,
+				(length - 24)
+			};
+		}
+	}
 }

@@ -1,5 +1,4 @@
 ﻿#region License Header
-
 // /***************************************************************************
 //  *   Copyright (c) 2011 OpenUO Software Team.
 //  *   All Right Reserved.
@@ -11,66 +10,57 @@
 //  *   the Free Software Foundation; either version 3 of the License, or
 //  *   (at your option) any later version.
 //  ***************************************************************************/
-
 #endregion
 
 namespace OpenUO.Core.Diagnostics
 {
-    public abstract class TraceListener : ITraceListener
-    {
-        protected TraceListener()
-        {
-            Enabled = true;
-            Tracer.TraceReceived += OnTraceReceived;
-        }
+	public abstract class TraceListener : ITraceListener
+	{
+		protected TraceListener()
+		{
+			Enabled = true;
+			Tracer.TraceReceived += OnTraceReceived;
+		}
 
-        public bool Enabled
-        {
-            get;
-            set;
-        }
+		public bool Enabled { get; set; }
 
-        public virtual TraceLevels? TraceLevel
-        {
-            get;
-            set;
-        }
+		public virtual TraceLevels? TraceLevel { get; set; }
 
-        public void Dispose()
-        {
-            Dispose(true);
-        }
+		public void Dispose()
+		{
+			Dispose(true);
+		}
 
-        private void OnTraceReceived(TraceMessageEventArgs e)
-        {
-            if (!Enabled)
-            {
-                return;
-            }
+		private void OnTraceReceived(TraceMessageEventArgs e)
+		{
+			if (!Enabled)
+			{
+				return;
+			}
 
-            TraceMessage message = e.TraceMessage;
+			TraceMessage message = e.TraceMessage;
 
-            if (!TraceLevel.HasValue && message.Type < Tracer.TraceLevel)
-            {
-                return;
-            }
+			if (!TraceLevel.HasValue && message.Type < Tracer.TraceLevel)
+			{
+				return;
+			}
 
-            if (TraceLevel.HasValue && message.Type < TraceLevel)
-            {
-                return;
-            }
+			if (TraceLevel.HasValue && message.Type < TraceLevel)
+			{
+				return;
+			}
 
-            OnTraceReceived(message);
-        }
+			OnTraceReceived(message);
+		}
 
-        protected abstract void OnTraceReceived(TraceMessage message);
+		protected abstract void OnTraceReceived(TraceMessage message);
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                Tracer.TraceReceived -= OnTraceReceived;
-            }
-        }
-    }
+		protected virtual void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				Tracer.TraceReceived -= OnTraceReceived;
+			}
+		}
+	}
 }

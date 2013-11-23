@@ -17,28 +17,30 @@
  ********************************************************/
 #endregion
 
+#region References
 using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
+#endregion
 
 namespace OpenUO.Core.PresentationFramework.Converters
 {
-    public sealed class CountToVisibilityConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if ((value != null) && (((int)value) > 0))
-            {
-                return Visibility.Visible;
-            }
+	public sealed class CountToVisibilityConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			if ((value != null) && (((int)value) > 0))
+			{
+				return Visibility.Visible;
+			}
 
-            return Visibility.Collapsed;
-        }
+			return Visibility.Collapsed;
+		}
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }

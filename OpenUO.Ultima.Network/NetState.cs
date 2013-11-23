@@ -7,271 +7,265 @@
  *   (at your option) any later version.
  *
  ***************************************************************************/
- #endregion
+#endregion
 
+#region References
 using System;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+
 using OpenUO.Core.Diagnostics;
+#endregion
 
 namespace OpenUO.Ultima.Network
 {
-    public class NetState 
-    {
-        private readonly BufferPool _recvBuffer;
-        private readonly MessagePump _messagePump;
+	public class NetState
+	{
+		private readonly BufferPool _recvBuffer;
+		private readonly MessagePump _messagePump;
 
-        private Socket _socket;
-        private IPAddress _address;
-        private IPEndPoint _hostEndPoint;
-        private ByteQueue _buffer;
-        private DateTime _connectedOn;
+		private Socket _socket;
+		private IPAddress _address;
+		private IPEndPoint _hostEndPoint;
+		private ByteQueue _buffer;
+		private DateTime _connectedOn;
 
-        private bool _isCompressionEnabled;
-        private bool _isConnected;
-        private bool _isDisposing;
+		private bool _isCompressionEnabled;
+		private bool _isConnected;
+		private bool _isDisposing;
 
-        public ByteQueue Buffer
-        {
-            get { return _buffer; }
-        }
+		public ByteQueue Buffer { get { return _buffer; } }
 
-        public bool IsConnected
-        {
-            get { return _isConnected; }
-        }
+		public bool IsConnected { get { return _isConnected; } }
 
-        public DateTime ConnectedOn
-        {
-            get { return _connectedOn; }
-        }
+		public DateTime ConnectedOn { get { return _connectedOn; } }
 
-        public TimeSpan ConnectedFor
-        {
-            get { return (DateTime.Now - _connectedOn); }
-        }
+		public TimeSpan ConnectedFor { get { return (DateTime.Now - _connectedOn); } }
 
-        public IPAddress Address
-        {
-            get { return _address; }
-        }
+		public IPAddress Address { get { return _address; } }
 
-        public bool IsCompressionEnabled
-        {
-            get { return _isCompressionEnabled; }
-            set { _isCompressionEnabled = value; }
-        }
+		public bool IsCompressionEnabled { get { return _isCompressionEnabled; } set { _isCompressionEnabled = value; } }
 
-        public event EventHandler Connected;
+		public event EventHandler Connected;
 
-        public NetState()
-        {
-            _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            _recvBuffer = new BufferPool("Receive Buffer", 16, 4096);
-            _messagePump = new MessagePump();
-            _buffer = new ByteQueue();
-        }
+		public NetState()
+		{
+			_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+			_recvBuffer = new BufferPool("Receive Buffer", 16, 4096);
+			_messagePump = new MessagePump();
+			_buffer = new ByteQueue();
+		}
 
-        public void BeginReceive()
-        {
-            SocketAsyncEventArgs args = new SocketAsyncEventArgs();
+		public void BeginReceive()
+		{
+			SocketAsyncEventArgs args = new SocketAsyncEventArgs();
 
-            byte[] buffer = _recvBuffer.AcquireBuffer();
+			var buffer = _recvBuffer.AcquireBuffer();
 
-            args.SetBuffer(buffer, 0, buffer.Length);
-            args.UserToken = this;
-            args.RemoteEndPoint = _hostEndPoint;
-            args.Completed += OnReceive;
+			args.SetBuffer(buffer, 0, buffer.Length);
+			args.UserToken = this;
+			args.RemoteEndPoint = _hostEndPoint;
+			args.Completed += OnReceive;
 
-            _socket.ReceiveAsync(args);
-        }
+			_socket.ReceiveAsync(args);
+		}
 
-        public void Connect(string ip, int port)
-        {
-            if (!IPAddress.TryParse(ip, out _address))
-                throw new Exception("Invalid IP, the ip must be a valid ip address and cannot be a host name.");
+		public void Connect(string ip, int port)
+		{
+			if (!IPAddress.TryParse(ip, out _address))
+			{
+				throw new Exception("Invalid IP, the ip must be a valid ip address and cannot be a host name.");
+			}
 
-            _hostEndPoint = new IPEndPoint(_address, port);
+			_hostEndPoint = new IPEndPoint(_address, port);
 
-            SocketAsyncEventArgs connectArgs = new SocketAsyncEventArgs();
+			SocketAsyncEventArgs connectArgs = new SocketAsyncEventArgs();
 
-            connectArgs.UserToken = this;
-            connectArgs.RemoteEndPoint = _hostEndPoint;
-            connectArgs.Completed += OnConnected;
+			connectArgs.UserToken = this;
+			connectArgs.RemoteEndPoint = _hostEndPoint;
+			connectArgs.Completed += OnConnected;
 
-            _socket.ConnectAsync(connectArgs);
-        }
+			_socket.ConnectAsync(connectArgs);
+		}
 
-        void OnConnected(object sender, SocketAsyncEventArgs e)
-        {
-            e.Completed -= OnConnected;
+		private void OnConnected(object sender, SocketAsyncEventArgs e)
+		{
+			e.Completed -= OnConnected;
 
-            SocketError errorCode = e.SocketError;
+			SocketError errorCode = e.SocketError;
 
-            if (errorCode != SocketError.Success)
-                throw new SocketException((Int32)errorCode);
+			if (errorCode != SocketError.Success)
+			{
+				throw new SocketException((Int32)errorCode);
+			}
 
-            _isConnected = true;
-            _connectedOn = DateTime.Now;
+			_isConnected = true;
+			_connectedOn = DateTime.Now;
 
-            var handler = Connected;
+			var handler = Connected;
 
-            if (handler != null)
-                handler(this, EventArgs.Empty);
+			if (handler != null)
+			{
+				handler(this, EventArgs.Empty);
+			}
 
-            BeginReceive();
-        }
+			BeginReceive();
+		}
 
-        public virtual void Send(Packet p)
-        {
-            if (_socket == null)
-            {
-                p.OnSend();
-                return;
-            }
+		public virtual void Send(Packet p)
+		{
+			if (_socket == null)
+			{
+				p.OnSend();
+				return;
+			}
 
-            int length;
-            byte[] buffer = p.Compile(_isCompressionEnabled, out length);
+			int length;
+			var buffer = p.Compile(_isCompressionEnabled, out length);
 
-            if (buffer != null)
-            {
-                if (buffer.Length <= 0 || length <= 0)
-                {
-                    p.OnSend();
-                    return;
-                }
+			if (buffer != null)
+			{
+				if (buffer.Length <= 0 || length <= 0)
+				{
+					p.OnSend();
+					return;
+				}
 
-                try
-                {
-                    SocketAsyncEventArgs args = new SocketAsyncEventArgs();
+				try
+				{
+					SocketAsyncEventArgs args = new SocketAsyncEventArgs();
 
-                    args.SetBuffer(buffer, 0, length);
-                    args.RemoteEndPoint = _hostEndPoint;
-                    args.UserToken = this;
+					args.SetBuffer(buffer, 0, length);
+					args.RemoteEndPoint = _hostEndPoint;
+					args.UserToken = this;
 
-                    _socket.SendAsync(args);
-                }
-                catch (CapacityExceededException)
-                {
-                    Tracer.Error("Too much data pending, disconnecting...");
-                    Dispose();
-                }
-                catch (Exception ex)
-                {
-                    Tracer.Error(ex);
-                    Dispose();
-                }
+					_socket.SendAsync(args);
+				}
+				catch (CapacityExceededException)
+				{
+					Tracer.Error("Too much data pending, disconnecting...");
+					Dispose();
+				}
+				catch (Exception ex)
+				{
+					Tracer.Error(ex);
+					Dispose();
+				}
 
-                p.OnSend();
-            }
-            else
-            {
-                Tracer.Error("Null buffer send, disconnecting...");
-                Tracer.Error(new StackTrace());
+				p.OnSend();
+			}
+			else
+			{
+				Tracer.Error("Null buffer send, disconnecting...");
+				Tracer.Error(new StackTrace());
 
-                Dispose();
-            }
-        }
+				Dispose();
+			}
+		}
 
-        private void OnReceive(object sender, SocketAsyncEventArgs e)
-        {
-            e.Completed -= OnConnected;
+		private void OnReceive(object sender, SocketAsyncEventArgs e)
+		{
+			e.Completed -= OnConnected;
 
-            SocketError errorCode = e.SocketError;
+			SocketError errorCode = e.SocketError;
 
-            if (errorCode != SocketError.Success)
-                throw new SocketException((Int32)errorCode);
+			if (errorCode != SocketError.Success)
+			{
+				throw new SocketException((Int32)errorCode);
+			}
 
-            try
-            {
-                int byteCount = e.BytesTransferred;
+			try
+			{
+				int byteCount = e.BytesTransferred;
 
-                if (byteCount > 0)
-                {
-                    byte[] buffer = e.Buffer;
+				if (byteCount > 0)
+				{
+					var buffer = e.Buffer;
 
-                    try
-                    {
-                        BeginReceive();
-                    }
-                    catch (Exception ex)
-                    {
-                        Tracer.Error(ex);
-                        Dispose();
-                    }
+					try
+					{
+						BeginReceive();
+					}
+					catch (Exception ex)
+					{
+						Tracer.Error(ex);
+						Dispose();
+					}
 
-                    if (_isCompressionEnabled)
-                    {
-                        byte[] unpackBuffer = _recvBuffer.AcquireBuffer();
+					if (_isCompressionEnabled)
+					{
+						var unpackBuffer = _recvBuffer.AcquireBuffer();
 
-                        int unpackSize;
-                        int sourceIndex = 0;
-                        int sourceSize = byteCount;
+						int unpackSize;
+						int sourceIndex = 0;
+						int sourceSize = byteCount;
 
-                        while (HuffmanCompression.Decompress(buffer, ref sourceIndex, sourceSize, unpackBuffer, out unpackSize))
-                        {                            
-                            lock (_buffer)
-                                _buffer.Enqueue(unpackBuffer, 0, unpackSize);
+						while (HuffmanCompression.Decompress(buffer, ref sourceIndex, sourceSize, unpackBuffer, out unpackSize))
+						{
+							lock (_buffer)
+								_buffer.Enqueue(unpackBuffer, 0, unpackSize);
 
-                            _messagePump.OnReceive(this);
-                        }
-                        
-                        _recvBuffer.ReleaseBuffer(buffer);
-                        _recvBuffer.ReleaseBuffer(unpackBuffer);
-                    }
-                    else
-                    {
-                        lock (_buffer)
-                            _buffer.Enqueue(buffer, 0, byteCount);
-                        
-                        _recvBuffer.ReleaseBuffer(buffer);
-                        _messagePump.OnReceive(this);
-                    }
-                }
-                else
-                {
-                    Dispose();
-                }
-            }
-            catch
-            {
-                Dispose();
-            }
-        }
+							_messagePump.OnReceive(this);
+						}
 
-        public void Dispose()
-        {
-            if (_socket == null || _isDisposing)
-                return;
+						_recvBuffer.ReleaseBuffer(buffer);
+						_recvBuffer.ReleaseBuffer(unpackBuffer);
+					}
+					else
+					{
+						lock (_buffer)
+							_buffer.Enqueue(buffer, 0, byteCount);
 
-            _isDisposing = true;
+						_recvBuffer.ReleaseBuffer(buffer);
+						_messagePump.OnReceive(this);
+					}
+				}
+				else
+				{
+					Dispose();
+				}
+			}
+			catch
+			{
+				Dispose();
+			}
+		}
 
-            try
-            {
-                _socket.Shutdown(SocketShutdown.Both);
-            }
-            catch (SocketException ex)
-            {
-                Tracer.Error(ex);
-            }
+		public void Dispose()
+		{
+			if (_socket == null || _isDisposing)
+			{
+				return;
+			}
 
-            try
-            {
-                _socket.Close();
-            }
-            catch (SocketException ex)
-            {
-                Tracer.Error(ex);
-            }
+			_isDisposing = true;
 
-            _socket = null;
-            _buffer = null;
-        }
+			try
+			{
+				_socket.Shutdown(SocketShutdown.Both);
+			}
+			catch (SocketException ex)
+			{
+				Tracer.Error(ex);
+			}
 
-        internal PacketHandler GetHandler(int packetID)
-        {
-            return PacketHandlers.GetHandler(packetID);
-        }
-    }
+			try
+			{
+				_socket.Close();
+			}
+			catch (SocketException ex)
+			{
+				Tracer.Error(ex);
+			}
+
+			_socket = null;
+			_buffer = null;
+		}
+
+		internal PacketHandler GetHandler(int packetID)
+		{
+			return PacketHandlers.GetHandler(packetID);
+		}
+	}
 }

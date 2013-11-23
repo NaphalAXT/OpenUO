@@ -17,34 +17,36 @@
  ********************************************************/
 #endregion
 
+#region References
 using System;
 using System.Globalization;
 using System.Windows.Data;
+#endregion
 
 namespace OpenUO.Core.PresentationFramework.Converters
 {
-    public sealed class BoolToOpacityConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            try
-            {
-                if ((bool)value)
-                {
-                    return 1;
-                }
+	public sealed class BoolToOpacityConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			try
+			{
+				if ((bool)value)
+				{
+					return 1;
+				}
 
-                return 0;
-            }
-            catch
-            {
-                return 1;
-            }
-        }
+				return 0;
+			}
+			catch
+			{
+				return 1;
+			}
+		}
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return null;
-        }
-    }
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			return null;
+		}
+	}
 }

@@ -1,5 +1,4 @@
 ﻿#region License Header
-
 // /***************************************************************************
 //  *   Copyright (c) 2011 OpenUO Software Team.
 //  *   All Right Reserved.
@@ -11,35 +10,29 @@
 //  *   the Free Software Foundation; either version 3 of the License, or
 //  *   (at your option) any later version.
 //  ***************************************************************************/
-
 #endregion
 
-#region Usings
-
+#region References
 using OpenUO.Core.Patterns;
 using OpenUO.Ultima.Adapters;
-
 #endregion
 
 namespace OpenUO.Ultima
 {
-    public class UltimaSDKCoreModule : IModule
-    {
-        public string Name
-        {
-            get { return "OpenUO Ultima SDK - Core Module"; }
-        }
+	public class UltimaSDKCoreModule : IModule
+	{
+		public string Name { get { return "OpenUO Ultima SDK - Core Module"; } }
 
-        public void OnLoad(Container container)
-        {
-            container.Register<IAnimationDataStorageAdapter<AnimationData>, AnimationDataStorageAdapter>();
-            container.Register<ISkillStorageAdapter<Skill>, SkillStorageAdapter>();
-            container.Register<ISoundStorageAdapter<Sound>, SoundStorageAdapter>();
-        }
+		public void OnLoad(Container container)
+		{
+			container.Register<IAnimationDataStorageAdapter<AnimationData>, AnimationDataStorageAdapter>();
+			container.Register<ISkillStorageAdapter<Skill>, SkillStorageAdapter>();
+			container.Register<ISoundStorageAdapter<Sound>, SoundStorageAdapter>();
+		}
 
-        public void OnUnload(Container container)
-        {
-            // TODO: Unregister types.
-        }
-    }
+		public void OnUnload(Container container)
+		{
+			// TODO: Unregister types.
+		}
+	}
 }

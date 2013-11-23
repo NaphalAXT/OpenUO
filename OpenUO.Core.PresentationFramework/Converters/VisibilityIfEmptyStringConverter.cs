@@ -17,28 +17,30 @@
  ********************************************************/
 #endregion
 
+#region References
 using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
+#endregion
 
 namespace OpenUO.Core.PresentationFramework.Converters
 {
-    public sealed class VisibilityIfEmptyStringConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value == null)
-            {
-                return Visibility.Visible;
-            }
-            
-            return string.IsNullOrWhiteSpace(value.ToString()) ? Visibility.Visible : Visibility.Collapsed;
-        }
+	public sealed class VisibilityIfEmptyStringConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			if (value == null)
+			{
+				return Visibility.Visible;
+			}
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
+			return string.IsNullOrWhiteSpace(value.ToString()) ? Visibility.Visible : Visibility.Collapsed;
+		}
+
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }

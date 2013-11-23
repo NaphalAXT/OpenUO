@@ -17,29 +17,29 @@
  ********************************************************/
 #endregion
 
+#region References
 using System;
 using System.Globalization;
 using System.Windows.Data;
+#endregion
 
 namespace OpenUO.Core.PresentationFramework.Converters
 {
-    public class StringToUpperCaseConverter : IValueConverter
-    {
-        public object Convert(object value, Type typeTarget, object parameter, CultureInfo culture)
-        {
-            if (value == null)
-            {
-                return value;
-            }
+	public class StringToUpperCaseConverter : IValueConverter
+	{
+		public object Convert(object value, Type typeTarget, object parameter, CultureInfo culture)
+		{
+			if (value == null)
+			{
+				return value;
+			}
 
-            return value.ToString().ToUpper();
-        }
+			return value.ToString().ToUpper();
+		}
 
-        public object ConvertBack(object value, Type typeTarget, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-
+		public object ConvertBack(object value, Type typeTarget, object parameter, CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }

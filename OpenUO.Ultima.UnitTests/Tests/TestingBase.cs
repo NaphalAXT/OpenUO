@@ -1,5 +1,4 @@
 ﻿#region License Header
-
 // /***************************************************************************
 //  *   Copyright (c) 2011 OpenUO Software Team.
 //  *   All Right Reserved.
@@ -11,44 +10,41 @@
 //  *   the Free Software Foundation; either version 3 of the License, or
 //  *   (at your option) any later version.
 //  ***************************************************************************/
-
 #endregion
 
-#region Usings
-
+#region References
 using OpenUO.Core;
 using OpenUO.Core.Diagnostics;
-
 #endregion
 
 namespace OpenUO.Ultima.UnitTests
 {
-    public class TestingBase
-    {
-        private static bool _configuredInstallForTest;
-        private static InstallLocation _install;
+	public class TestingBase
+	{
+		private static bool _configuredInstallForTest;
+		private static InstallLocation _install;
 
-        protected static InstallLocation Install
-        {
-            get
-            {
-                if (!_configuredInstallForTest)
-                {
-                    using (SelectInstallForm form = new SelectInstallForm("CoreAdapterTests"))
-                    {
-                        form.ShowDialog();
-                        _install = form.SelectedInstall;
-                        _configuredInstallForTest = true;
-                    }
+		protected static InstallLocation Install
+		{
+			get
+			{
+				if (!_configuredInstallForTest)
+				{
+					using (SelectInstallForm form = new SelectInstallForm("CoreAdapterTests"))
+					{
+						form.ShowDialog();
+						_install = form.SelectedInstall;
+						_configuredInstallForTest = true;
+					}
 
-                    //Outputs Trace warnings and errors to the Visual Studio Output Console.
-                    new DebugTraceListener();
-                }
+					//Outputs Trace warnings and errors to the Visual Studio Output Console.
+					new DebugTraceListener();
+				}
 
-                Guard.AssertIsNotNull(_install, "Ultima Online is not installed");
+				Guard.AssertIsNotNull(_install, "Ultima Online is not installed");
 
-                return _install;
-            }
-        }
-    }
+				return _install;
+			}
+		}
+	}
 }

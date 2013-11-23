@@ -1,5 +1,4 @@
 ﻿#region License Header
-
 // /***************************************************************************
 //  *   Copyright (c) 2011 OpenUO Software Team.
 //  *   All Right Reserved.
@@ -11,29 +10,16 @@
 //  *   the Free Software Foundation; either version 3 of the License, or
 //  *   (at your option) any later version.
 //  ***************************************************************************/
-
 #endregion
 
 namespace OpenUO.Ultima
 {
-    public class ASCIIChar
-    {
-        public ushort[] Pixels
-        {
-            get;
-            set;
-        }
+	public class ASCIIChar
+	{
+		public ushort[] Pixels { get; set; }
 
-        public int Height
-        {
-            get;
-            set;
-        }
+		public int Height { get; set; }
 
-        public int Width
-        {
-            get;
-            set;
-        }
-    }
+		public int Width { get; set; }
+	}
 }

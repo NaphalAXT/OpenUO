@@ -1,8 +1,7 @@
-﻿
-namespace OpenUO.Core.PresentationFramework.Input
+﻿namespace OpenUO.Core.PresentationFramework.Input
 {
-    public interface IRaiseCanExecuteChanged
-    {
-        void RaiseCanExecuteChanged();
-    }
+	public interface IRaiseCanExecuteChanged
+	{
+		void RaiseCanExecuteChanged();
+	}
 }

@@ -1,5 +1,4 @@
 ﻿#region License Header
-
 // /***************************************************************************
 //  *   Copyright (c) 2011 OpenUO Software Team.
 //  *   All Right Reserved.
@@ -11,30 +10,20 @@
 //  *   the Free Software Foundation; either version 3 of the License, or
 //  *   (at your option) any later version.
 //  ***************************************************************************/
-
 #endregion
 
-#region Usings
-
+#region References
 using System;
-
 #endregion
 
 namespace OpenUO.Ultima.Adapters
 {
-    public interface IStorageAdapter : IDisposable
-    {
-        int Length
-        {
-            get;
-        }
+	public interface IStorageAdapter : IDisposable
+	{
+		int Length { get; }
 
-        InstallLocation Install
-        {
-            get;
-            set;
-        }
+		InstallLocation Install { get; set; }
 
-        void Initialize();
-    }
+		void Initialize();
+	}
 }

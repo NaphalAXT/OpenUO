@@ -1,5 +1,4 @@
 #region License Header
-
 // /***************************************************************************
 //  *   Copyright (c) 2011 OpenUO Software Team.
 //  *   All Right Reserved.
@@ -11,100 +10,99 @@
 //  *   the Free Software Foundation; either version 3 of the License, or
 //  *   (at your option) any later version.
 //  ***************************************************************************/
-
 #endregion
 
-#region Usings
-
+#region References
 using System.Collections.Generic;
-
 #endregion
 
 namespace OpenUO.Core.IO
 {
-    public class BufferPool
-    {
-        private static List<BufferPool> _pools = new List<BufferPool>();
+	public class BufferPool
+	{
+		private static List<BufferPool> _pools = new List<BufferPool>();
 
-        private readonly int _bufferSize;
+		private readonly int _bufferSize;
 
-        private readonly Queue<byte[]> _freeBuffers;
-        private readonly int _initialCapacity;
-        private readonly string _name;
-        private int _misses;
+		private readonly Queue<byte[]> _freeBuffers;
+		private readonly int _initialCapacity;
+		private readonly string _name;
+		private int _misses;
 
-        public BufferPool(string name, int initialCapacity, int bufferSize)
-        {
-            _name = name;
+		public BufferPool(string name, int initialCapacity, int bufferSize)
+		{
+			_name = name;
 
-            _initialCapacity = initialCapacity;
-            _bufferSize = bufferSize;
+			_initialCapacity = initialCapacity;
+			_bufferSize = bufferSize;
 
-            _freeBuffers = new Queue<byte[]>(initialCapacity);
+			_freeBuffers = new Queue<byte[]>(initialCapacity);
 
-            for (int i = 0; i < initialCapacity; ++i)
-            {
-                _freeBuffers.Enqueue(new byte[bufferSize]);
-            }
+			for (int i = 0; i < initialCapacity; ++i)
+			{
+				_freeBuffers.Enqueue(new byte[bufferSize]);
+			}
 
-            lock (_pools)
-                _pools.Add(this);
-        }
+			lock (_pools)
+				_pools.Add(this);
+		}
 
-        public static List<BufferPool> Pools
-        {
-            get { return _pools; }
-            set { _pools = value; }
-        }
+		public static List<BufferPool> Pools { get { return _pools; } set { _pools = value; } }
 
-        public void GetInfo(out string name, out int freeCount, out int initialCapacity, out int currentCapacity, out int bufferSize, out int misses)
-        {
-            lock (this)
-            {
-                name = _name;
-                freeCount = _freeBuffers.Count;
-                initialCapacity = _initialCapacity;
-                currentCapacity = _initialCapacity * (1 + _misses);
-                bufferSize = _bufferSize;
-                misses = _misses;
-            }
-        }
+		public void GetInfo(
+			out string name,
+			out int freeCount,
+			out int initialCapacity,
+			out int currentCapacity,
+			out int bufferSize,
+			out int misses)
+		{
+			lock (this)
+			{
+				name = _name;
+				freeCount = _freeBuffers.Count;
+				initialCapacity = _initialCapacity;
+				currentCapacity = _initialCapacity * (1 + _misses);
+				bufferSize = _bufferSize;
+				misses = _misses;
+			}
+		}
 
-        public byte[] AcquireBuffer()
-        {
-            lock (this)
-            {
-                if (_freeBuffers.Count > 0)
-                {
-                    return _freeBuffers.Dequeue();
-                }
+		public byte[] AcquireBuffer()
+		{
+			lock (this)
+			{
+				if (_freeBuffers.Count > 0)
+				{
+					return _freeBuffers.Dequeue();
+				}
 
-                ++_misses;
+				++_misses;
 
-                for (int i = 0; i < _initialCapacity; ++i)
-                {
-                    _freeBuffers.Enqueue(new byte[_bufferSize]);
-                }
+				for (int i = 0; i < _initialCapacity; ++i)
+				{
+					_freeBuffers.Enqueue(new byte[_bufferSize]);
+				}
 
-                return _freeBuffers.Dequeue();
-            }
-        }
+				return _freeBuffers.Dequeue();
+			}
+		}
 
-        public void ReleaseBuffer(byte[] buffer)
-        {
-            if (buffer == null)
-            {
-                return;
-            }
+		public void ReleaseBuffer(byte[] buffer)
+		{
+			if (buffer == null)
+			{
+				return;
+			}
 
-            lock (this)
-                _freeBuffers.Enqueue(buffer);
-        }
+			lock (this)
+				_freeBuffers.Enqueue(buffer);
+		}
 
-        public void Free()
-        {
-            lock (_pools)
-                _pools.Remove(this);
-        }
-    }
+		public void Free()
+		{
+			lock (_pools)
+				_pools.Remove(this);
+		}
+	}
 }

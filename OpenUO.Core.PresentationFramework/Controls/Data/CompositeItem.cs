@@ -1,26 +1,20 @@
-﻿using System.Collections.ObjectModel;
+﻿#region References
+using System.Collections.ObjectModel;
+#endregion
 
 namespace OpenUO.Core.PresentationFramework.Data
 {
 	public abstract class CompositeItem : Item
 	{
 		#region Fields
-
 		private readonly ObservableCollection<Item> _items = new ObservableCollection<Item>();
-
 		#endregion
 
 		#region Properties
-
-		public ObservableCollection<Item> Items
-		{
-			get { return _items; }
-		} 
-
+		public ObservableCollection<Item> Items { get { return _items; } }
 		#endregion
 
 		#region IDisposable Members
-
 		protected override void Dispose(bool disposing)
 		{
 			if (Disposed)
@@ -36,7 +30,6 @@ namespace OpenUO.Core.PresentationFramework.Data
 			}
 			base.Dispose(disposing);
 		}
-
 		#endregion
 	}
 }

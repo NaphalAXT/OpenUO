@@ -17,40 +17,41 @@
  ********************************************************/
 #endregion
 
+#region References
 using System;
 using System.Globalization;
 using System.Windows.Data;
+#endregion
 
 namespace OpenUO.Core.PresentationFramework.Converters
 {
-    public sealed class StringLengthToBoolConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value == null)
-            {
-                return false;
-            }
+	public sealed class StringLengthToBoolConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			if (value == null)
+			{
+				return false;
+			}
 
-            bool includeWhiteSpace = false;
+			bool includeWhiteSpace = false;
 
-            if (parameter is bool)
-            {
-                includeWhiteSpace = (bool)parameter;
-            }
+			if (parameter is bool)
+			{
+				includeWhiteSpace = (bool)parameter;
+			}
 
-            if (includeWhiteSpace)
-            {
-                return string.IsNullOrWhiteSpace(value.ToString());
-            }
-            
-            return string.IsNullOrEmpty(value.ToString());
-        }
+			if (includeWhiteSpace)
+			{
+				return string.IsNullOrWhiteSpace(value.ToString());
+			}
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
+			return string.IsNullOrEmpty(value.ToString());
+		}
 
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }

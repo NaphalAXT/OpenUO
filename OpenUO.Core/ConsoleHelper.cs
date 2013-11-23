@@ -1,5 +1,4 @@
 ﻿#region License Header
-
 // /***************************************************************************
 //  *   Copyright (c) 2011 OpenUO Software Team.
 //  *   All Right Reserved.
@@ -11,51 +10,46 @@
 //  *   the Free Software Foundation; either version 3 of the License, or
 //  *   (at your option) any later version.
 //  ***************************************************************************/
-
 #endregion
 
-#region Usings
-
+#region References
 using System;
 using System.Collections.Generic;
-
 #endregion
 
 namespace OpenUO.Core
 {
-    public static class ConsoleHelper
-    {
-        private static readonly Stack<ConsoleColor> _consoleColors = new Stack<ConsoleColor>();
+	public static class ConsoleHelper
+	{
+		private static readonly Stack<ConsoleColor> _consoleColors = new Stack<ConsoleColor>();
 
-        /// <summary>
-        ///     Pushes the color to the console
-        /// </summary>
-        public static void PushColor(ConsoleColor color)
-        {
-            try
-            {
-                _consoleColors.Push(Console.ForegroundColor);
-                Console.ForegroundColor = color;
-            }
-            catch
-            {
-            }
-        }
+		/// <summary>
+		///     Pushes the color to the console
+		/// </summary>
+		public static void PushColor(ConsoleColor color)
+		{
+			try
+			{
+				_consoleColors.Push(Console.ForegroundColor);
+				Console.ForegroundColor = color;
+			}
+			catch
+			{ }
+		}
 
-        /// <summary>
-        ///     Pops the color of the console to the previous value.
-        /// </summary>
-        public static ConsoleColor PopColor()
-        {
-            try
-            {
-                Console.ForegroundColor = _consoleColors.Pop();
-            }
-            catch
-            {
-            }
+		/// <summary>
+		///     Pops the color of the console to the previous value.
+		/// </summary>
+		public static ConsoleColor PopColor()
+		{
+			try
+			{
+				Console.ForegroundColor = _consoleColors.Pop();
+			}
+			catch
+			{ }
 
-            return Console.ForegroundColor;
-        }
-    }
+			return Console.ForegroundColor;
+		}
+	}
 }

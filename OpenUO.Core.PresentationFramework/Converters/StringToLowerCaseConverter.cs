@@ -17,29 +17,29 @@
  ********************************************************/
 #endregion
 
+#region References
 using System;
 using System.Globalization;
 using System.Windows.Data;
+#endregion
 
 namespace OpenUO.Core.PresentationFramework.Converters
 {
-    public class StringToLowerCaseConverter : IValueConverter
-    {
-        public object Convert(object value, Type typeTarget, object parameter, CultureInfo culture)
-        {
-            if (value == null)
-            {
-                return value;
-            }
+	public class StringToLowerCaseConverter : IValueConverter
+	{
+		public object Convert(object value, Type typeTarget, object parameter, CultureInfo culture)
+		{
+			if (value == null)
+			{
+				return value;
+			}
 
-            return value.ToString().ToLower();
-        }
+			return value.ToString().ToLower();
+		}
 
-        public object ConvertBack(object value, Type typeTarget, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-
+		public object ConvertBack(object value, Type typeTarget, object parameter, CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }

@@ -1,5 +1,4 @@
 ﻿#region License Header
-
 // /***************************************************************************
 //  *   Copyright (c) 2011 OpenUO Software Team.
 //  *   All Right Reserved.
@@ -11,55 +10,45 @@
 //  *   the Free Software Foundation; either version 3 of the License, or
 //  *   (at your option) any later version.
 //  ***************************************************************************/
-
 #endregion
 
 namespace OpenUO.Ultima
 {
-    public class SkillCategory
-    {
-        private SkillCategoryData _data;
-        private int _index = -1;
-        private string _name = string.Empty;
+	public class SkillCategory
+	{
+		private SkillCategoryData _data;
+		private int _index = -1;
+		private string _name = string.Empty;
 
-        public SkillCategory(SkillCategoryData data)
-        {
-            _data = data;
-            _index = _data.Index;
-            _name = _data.Name;
-        }
+		public SkillCategory(SkillCategoryData data)
+		{
+			_data = data;
+			_index = _data.Index;
+			_name = _data.Name;
+		}
 
-        public SkillCategoryData Data
-        {
-            get { return _data; }
-        }
+		public SkillCategoryData Data { get { return _data; } }
 
-        public int Index
-        {
-            get { return _index; }
-        }
+		public int Index { get { return _index; } }
 
-        public string Name
-        {
-            get { return _name; }
-        }
+		public string Name { get { return _name; } }
 
-        public void ResetFromData()
-        {
-            _index = _data.Index;
-            _name = _data.Name;
-        }
+		public void ResetFromData()
+		{
+			_index = _data.Index;
+			_name = _data.Name;
+		}
 
-        public void ResetFromData(SkillCategoryData data)
-        {
-            _data = data;
-            _index = _data.Index;
-            _name = _data.Name;
-        }
+		public void ResetFromData(SkillCategoryData data)
+		{
+			_data = data;
+			_index = _data.Index;
+			_name = _data.Name;
+		}
 
-        public override string ToString()
-        {
-            return string.Format("{{SkillCategory: {0}}}", _name);
-        }
-    }
+		public override string ToString()
+		{
+			return string.Format("{{SkillCategory: {0}}}", _name);
+		}
+	}
 }

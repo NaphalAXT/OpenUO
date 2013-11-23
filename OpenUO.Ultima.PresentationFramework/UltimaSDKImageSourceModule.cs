@@ -1,5 +1,4 @@
 ﻿#region License Header
-
 // /***************************************************************************
 //  *   Copyright (c) 2011 OpenUO Software Team.
 //  *   All Right Reserved.
@@ -11,44 +10,38 @@
 //  *   the Free Software Foundation; either version 3 of the License, or
 //  *   (at your option) any later version.
 //  ***************************************************************************/
-
 #endregion
 
-#region Usings
-
+#region References
 using System.Windows.Media;
+
 using OpenUO.Core.Patterns;
 using OpenUO.Ultima.Adapters;
 using OpenUO.Ultima.PresentationFramework.Adapters;
-
 #endregion
 
 namespace OpenUO.Ultima.PresentationFramework
 {
-    public class UltimaSDKImageSourceModule : IModule
-    {
-        public string Name
-        {
-            get { return "OpenUO Ultima SDK - ImageSource Module"; }
-        }
+	public class UltimaSDKImageSourceModule : IModule
+	{
+		public string Name { get { return "OpenUO Ultima SDK - ImageSource Module"; } }
 
-        public void OnLoad(Container container)
-        {
-            container.Register<IArtworkStorageAdapter<ImageSource>, ArtworkImageSourceAdapter>();
-            container.Register<IAnimationStorageAdapter<ImageSource>, AnimationImageSourceStorageAdapter>();
-            container.Register<IASCIIFontStorageAdapter<ImageSource>, ASCIIFontImageSourceAdapter>();
-            container.Register<IGumpStorageAdapter<ImageSource>, GumpImageSourceAdapter>();
-            container.Register<ITexmapStorageAdapter<ImageSource>, TexmapImageSourceAdapter>();
-            container.Register<IUnicodeFontStorageAdapter<ImageSource>, UnicodeFontImageSourceAdapter>();
-        }
+		public void OnLoad(Container container)
+		{
+			container.Register<IArtworkStorageAdapter<ImageSource>, ArtworkImageSourceAdapter>();
+			container.Register<IAnimationStorageAdapter<ImageSource>, AnimationImageSourceStorageAdapter>();
+			container.Register<IASCIIFontStorageAdapter<ImageSource>, ASCIIFontImageSourceAdapter>();
+			container.Register<IGumpStorageAdapter<ImageSource>, GumpImageSourceAdapter>();
+			container.Register<ITexmapStorageAdapter<ImageSource>, TexmapImageSourceAdapter>();
+			container.Register<IUnicodeFontStorageAdapter<ImageSource>, UnicodeFontImageSourceAdapter>();
+		}
 
-        public void OnUnload(Container container)
-        {
-        }
+		public void OnUnload(Container container)
+		{ }
 
-        private T Get<T>()
-        {
-            return default(T);
-        }
-    }
+		private T Get<T>()
+		{
+			return default(T);
+		}
+	}
 }

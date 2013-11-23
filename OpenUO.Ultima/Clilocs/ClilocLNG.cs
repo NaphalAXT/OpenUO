@@ -1,5 +1,4 @@
 ﻿#region License Header
-
 // /***************************************************************************
 //  *   Copyright (c) 2011 OpenUO Software Team.
 //  *   All Right Reserved.
@@ -11,19 +10,18 @@
 //  *   the Free Software Foundation; either version 3 of the License, or
 //  *   (at your option) any later version.
 //  ***************************************************************************/
-
 #endregion
 
 namespace OpenUO.Ultima
 {
-    public enum ClientLocalizationLanguage
-    {
-        NULL,
-        ENU,
-        DEU,
-        ESP,
-        FRA,
-        JPN,
-        KOR
-    }
+	public enum ClientLocalizationLanguage
+	{
+		NULL,
+		ENU,
+		DEU,
+		ESP,
+		FRA,
+		JPN,
+		KOR
+	}
 }

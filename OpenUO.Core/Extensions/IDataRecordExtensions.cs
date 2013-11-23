@@ -1,5 +1,4 @@
 ﻿#region License Header
-
 // /***************************************************************************
 //  *   Copyright (c) 2011 OpenUO Software Team.
 //  *   All Right Reserved.
@@ -11,69 +10,66 @@
 //  *   the Free Software Foundation; either version 3 of the License, or
 //  *   (at your option) any later version.
 //  ***************************************************************************/
-
 #endregion
 
-#region Usings
-
+#region References
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
+
 using OpenUO.Core.Data;
 using OpenUO.Core.Reflection;
-
 #endregion
 
 namespace OpenUO.Core
 {
-    public static class IDataRecordExtensions
-    {
-        private static readonly Dictionary<string, Dictionary<string, PropertyAccessor>> _propertyAccessorsLookup =
-            new Dictionary<string, Dictionary<string, PropertyAccessor>>();
+	public static class IDataRecordExtensions
+	{
+		private static readonly Dictionary<string, Dictionary<string, PropertyAccessor>> _propertyAccessorsLookup =
+			new Dictionary<string, Dictionary<string, PropertyAccessor>>();
 
-        public static void MapTo<T>(this IDataRecord reader, T item)
-        {
-            Type type = typeof (T);
-            PropertyInfo[] properties = type.GetProperties();
+		public static void MapTo<T>(this IDataRecord reader, T item)
+		{
+			Type type = typeof(T);
+			var properties = type.GetProperties();
 
-            foreach (PropertyInfo property in properties)
-            {
-                object[] attributes = property.GetCustomAttributes(typeof (ColumnAttribute), true);
+			foreach (PropertyInfo property in properties)
+			{
+				var attributes = property.GetCustomAttributes(typeof(ColumnAttribute), true);
 
-                if (attributes.Length > 0)
-                {
-                    Dictionary<string, PropertyAccessor> propertyAccessorTable;
+				if (attributes.Length > 0)
+				{
+					Dictionary<string, PropertyAccessor> propertyAccessorTable;
 
-                    if (!_propertyAccessorsLookup.TryGetValue(type.FullName, out propertyAccessorTable))
-                    {
-                        propertyAccessorTable = new Dictionary<string, PropertyAccessor>();
-                        _propertyAccessorsLookup.Add(type.FullName, propertyAccessorTable);
-                    }
+					if (!_propertyAccessorsLookup.TryGetValue(type.FullName, out propertyAccessorTable))
+					{
+						propertyAccessorTable = new Dictionary<string, PropertyAccessor>();
+						_propertyAccessorsLookup.Add(type.FullName, propertyAccessorTable);
+					}
 
-                    PropertyAccessor propertyAccessor;
+					PropertyAccessor propertyAccessor;
 
-                    if (!propertyAccessorTable.TryGetValue(property.Name, out propertyAccessor))
-                    {
-                        propertyAccessor = new PropertyAccessor(typeof (T), property);
-                        propertyAccessorTable.Add(property.Name, propertyAccessor);
-                    }
+					if (!propertyAccessorTable.TryGetValue(property.Name, out propertyAccessor))
+					{
+						propertyAccessor = new PropertyAccessor(typeof(T), property);
+						propertyAccessorTable.Add(property.Name, propertyAccessor);
+					}
 
-                    ColumnAttribute dataFieldAttr = (ColumnAttribute)attributes[0];
+					ColumnAttribute dataFieldAttr = (ColumnAttribute)attributes[0];
 
-                    propertyAccessor.Set(item, reader[dataFieldAttr.Name].ConvertTo(property.PropertyType));
-                }
-            }
-        }
+					propertyAccessor.Set(item, reader[dataFieldAttr.Name].ConvertTo(property.PropertyType));
+				}
+			}
+		}
 
-        public static T CreateType<T>(this IDataRecord row)
-            where T : new()
-        {
-            T item = new T();
+		public static T CreateType<T>(this IDataRecord row) where T : new()
+		{
+			T item = new T();
 
-            row.MapTo(item);
+			row.MapTo(item);
 
-            return item;
-        }
-    }
+			return item;
+		}
+	}
 }

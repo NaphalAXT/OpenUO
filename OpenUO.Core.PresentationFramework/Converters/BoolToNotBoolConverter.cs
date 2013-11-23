@@ -17,31 +17,34 @@
  ********************************************************/
 #endregion
 
+#region References
 using System;
+using System.Globalization;
 using System.Windows.Data;
+#endregion
 
 namespace OpenUO.Core.PresentationFramework.Converters
 {
-    public sealed class BoolToNotBoolConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            if (value is bool)
-            {
-                return !((bool)value);
-            }
+	public sealed class BoolToNotBoolConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			if (value is bool)
+			{
+				return !((bool)value);
+			}
 
-            return null;
-        }
+			return null;
+		}
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            if (value is bool)
-            {
-                return !((bool)value);
-            }
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			if (value is bool)
+			{
+				return !((bool)value);
+			}
 
-            return null;
-        }
-    }
+			return null;
+		}
+	}
 }

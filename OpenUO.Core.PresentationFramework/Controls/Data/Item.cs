@@ -1,12 +1,13 @@
-﻿using System;
+﻿#region References
+using System;
 using System.ComponentModel;
+#endregion
 
 namespace OpenUO.Core.PresentationFramework.Data
 {
 	public abstract class Item : INotifyPropertyChanged, IDisposable
 	{
 		#region Notify Property Changed Members
-
 		protected void NotifyPropertyChanged(string property)
 		{
 			if (PropertyChanged != null)
@@ -16,24 +17,19 @@ namespace OpenUO.Core.PresentationFramework.Data
 		}
 
 		public event PropertyChangedEventHandler PropertyChanged;
-
 		#endregion
 
 		#region IDisposable Members
+		private bool _disposed;
 
-		private bool _disposed = false;
-
-		protected bool Disposed
-		{
-			get { return _disposed; }
-		}
+		protected bool Disposed { get { return _disposed; } }
 
 		protected virtual void Dispose(bool disposing)
 		{
 			if (!Disposed)
 			{
-				_disposed = true;				
-			}			
+				_disposed = true;
+			}
 		}
 
 		public void Dispose()
@@ -42,8 +38,10 @@ namespace OpenUO.Core.PresentationFramework.Data
 			GC.SuppressFinalize(this);
 		}
 
-		~Item() { Dispose(false); }
-
+		~Item()
+		{
+			Dispose(false);
+		}
 		#endregion
 	}
 }

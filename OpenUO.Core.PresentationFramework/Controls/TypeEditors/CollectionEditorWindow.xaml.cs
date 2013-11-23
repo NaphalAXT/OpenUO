@@ -1,85 +1,92 @@
-﻿using System;
+﻿#region References
+using System;
 using System.Windows;
+using System.Windows.Controls;
+
 using OpenUO.Core.PresentationFramework.Themes.TypeEditors;
+#endregion
 
 namespace OpenUO.Core.PresentationFramework.TypeEditors
 {
-    /// <summary>
-    /// Interaction logic for CollectionEditor.xaml
-    /// </summary>
-    public partial class CollectionEditorWindow : Window
-    {
-        public CollectionEditorControl baseControl { get; set; }
+	/// <summary>
+	///     Interaction logic for CollectionEditor.xaml
+	/// </summary>
+	public partial class CollectionEditorWindow : Window
+	{
+		public CollectionEditorControl baseControl { get; set; }
 
-        public bool HasDefaultConstructor(Type type)
-        {
-            if (type.IsValueType)
-                return true;
+		public bool HasDefaultConstructor(Type type)
+		{
+			if (type.IsValueType)
+			{
+				return true;
+			}
 
-            var constructor = type.GetConstructor(Type.EmptyTypes);
+			var constructor = type.GetConstructor(Type.EmptyTypes);
 
-            if (constructor == null)
-                return false;
+			if (constructor == null)
+			{
+				return false;
+			}
 
-            return true;
-        }
-        public CollectionEditorWindow(CollectionEditorControl ctrl)
-        {
-            InitializeComponent();
-            baseControl = ctrl;
+			return true;
+		}
 
-            foreach (var tmp in baseControl.NumerableValue)
-            {
-                myLst.Items.Add(tmp);
-            }
+		public CollectionEditorWindow(CollectionEditorControl ctrl)
+		{
+			InitializeComponent();
+			baseControl = ctrl;
 
-            //Visibilty of cmdAdd
+			foreach (var tmp in baseControl.NumerableValue)
+			{
+				myLst.Items.Add(tmp);
+			}
 
-            //var aa = baseControl.MyProperty.PropertyType.GetGenericArguments();
-            if (!HasDefaultConstructor(baseControl.MyProperty.PropertyType.GetGenericArguments()[0]) || baseControl.MyProperty.IsReadOnly)
-            {
-                cmdAdd.Visibility = Visibility.Collapsed;
-            }
+			//Visibilty of cmdAdd
 
-            if (baseControl.MyProperty.IsReadOnly)
-                cmdRemove.Visibility = Visibility.Collapsed;
+			//var aa = baseControl.MyProperty.PropertyType.GetGenericArguments();
+			if (!HasDefaultConstructor(baseControl.MyProperty.PropertyType.GetGenericArguments()[0]) ||
+				baseControl.MyProperty.IsReadOnly)
+			{
+				cmdAdd.Visibility = Visibility.Collapsed;
+			}
 
+			if (baseControl.MyProperty.IsReadOnly)
+			{
+				cmdRemove.Visibility = Visibility.Collapsed;
+			}
 
-            //myLst.ItemsSource = baseControl.NumerableValue;
-        }
+			//myLst.ItemsSource = baseControl.NumerableValue;
+		}
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
+		private void Button_Click(object sender, RoutedEventArgs e)
+		{
+			Close();
+		}
 
-        private void cmdRemove_Click(object sender, RoutedEventArgs e)
-        {
-            if (myLst.SelectedItem != null)
-            {
-                myLst.Items.Remove(myLst.SelectedItem);
-            }
-            myGrid.Instance = null;
-        }
+		private void cmdRemove_Click(object sender, RoutedEventArgs e)
+		{
+			if (myLst.SelectedItem != null)
+			{
+				myLst.Items.Remove(myLst.SelectedItem);
+			}
+			myGrid.Instance = null;
+		}
 
-        private void myLst_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-        {
-            myGrid.Instance = myLst.SelectedItem;
-        }
+		private void myLst_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			myGrid.Instance = myLst.SelectedItem;
+		}
 
-        private void cmdOk_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
+		private void cmdOk_Click(object sender, RoutedEventArgs e)
+		{
+			Close();
+		}
 
-        private void cmdAdd_Click(object sender, RoutedEventArgs e)
-        {
-            object newElem = System.Activator.CreateInstance(baseControl.MyProperty.PropertyType.GetGenericArguments()[0]);
-            myLst.Items.Add(newElem);
-        }
-
-
-
-
-    }
+		private void cmdAdd_Click(object sender, RoutedEventArgs e)
+		{
+			object newElem = Activator.CreateInstance(baseControl.MyProperty.PropertyType.GetGenericArguments()[0]);
+			myLst.Items.Add(newElem);
+		}
+	}
 }

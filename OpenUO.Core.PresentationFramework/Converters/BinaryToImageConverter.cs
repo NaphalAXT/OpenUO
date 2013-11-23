@@ -17,61 +17,67 @@
  ********************************************************/
 #endregion
 
+#region References
 using System;
+using System.Globalization;
 using System.IO;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
+#endregion
 
 namespace OpenUO.Core.PresentationFramework.Converters
 {
-    public class BinaryToImageConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            BitmapImage defaultImage = null;
+	public class BinaryToImageConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			BitmapImage defaultImage = null;
 
-            if (parameter is BitmapImage)
-            {
-                defaultImage = parameter as BitmapImage;
-            }
+			if (parameter is BitmapImage)
+			{
+				defaultImage = parameter as BitmapImage;
+			}
 
-            string url = string.Empty;
+			string url = string.Empty;
 
-            if (parameter is string && !string.IsNullOrWhiteSpace(url = parameter.ToString()))
-            {
-                defaultImage = new BitmapImage(new Uri(url, UriKind.Relative));
-            }
+			if (parameter is string && !string.IsNullOrWhiteSpace(url = parameter.ToString()))
+			{
+				defaultImage = new BitmapImage(new Uri(url, UriKind.Relative));
+			}
 
-            byte[] buffer = value as byte[];
+			var buffer = value as byte[];
 
-            if (buffer == null || buffer.Length == 0)
-            {
-                return defaultImage;
-            }
+			if (buffer == null || buffer.Length == 0)
+			{
+				return defaultImage;
+			}
 
-            BitmapImage image = new BitmapImage();
+			BitmapImage image = new BitmapImage();
 
-            try
-            {
-                MemoryStream streamSource = new MemoryStream(buffer);
+			try
+			{
+				MemoryStream streamSource = new MemoryStream(buffer);
 
 #if SILVERLIGHT
                 image.SetSource(streamSource);
 
 #else
-                image.BeginInit();
-                image.StreamSource = streamSource;
-                image.EndInit();
+				image.BeginInit();
+				image.StreamSource = streamSource;
+				image.EndInit();
 #endif
-            }
-            catch { image = defaultImage; } // TODO: Need to log this, or do something other then swallow the exception...
+			}
+			catch
+			{
+				image = defaultImage;
+			} // TODO: Need to log this, or do something other then swallow the exception...
 
-            return image;
-        }
+			return image;
+		}
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }

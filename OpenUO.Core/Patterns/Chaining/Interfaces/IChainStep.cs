@@ -1,5 +1,4 @@
 ﻿#region License Header
-
 // /***************************************************************************
 //  *   Copyright (c) 2011 OpenUO Software Team.
 //  *   All Right Reserved.
@@ -11,63 +10,36 @@
 //  *   the Free Software Foundation; either version 3 of the License, or
 //  *   (at your option) any later version.
 //  ***************************************************************************/
-
 #endregion
 
 namespace OpenUO.Core.Patterns
 {
-    public interface IChainStep<T>
-        where T : class
-    {
-        string Name
-        {
-            get;
-        }
+	public interface IChainStep<T>
+		where T : class
+	{
+		string Name { get; }
 
-        bool CancelExecution
-        {
-            get;
-            set;
-        }
+		bool CancelExecution { get; set; }
 
-        IChainStep<T> Successor
-        {
-            get;
-            set;
-        }
+		IChainStep<T> Successor { get; set; }
 
-        IChain<T> Chain
-        {
-            get;
-            set;
-        }
+		IChain<T> Chain { get; set; }
 
-        ChainDependency[] Dependencies
-        {
-            get;
-        }
+		ChainDependency[] Dependencies { get; }
 
-        void Execute(T state);
-    }
+		void Execute(T state);
+	}
 
-    public class ChainDependency
-    {
-        public ChainDependency(string name, bool mustExist)
-        {
-            Name = name;
-            MustExist = mustExist;
-        }
+	public class ChainDependency
+	{
+		public ChainDependency(string name, bool mustExist)
+		{
+			Name = name;
+			MustExist = mustExist;
+		}
 
-        public string Name
-        {
-            get;
-            set;
-        }
+		public string Name { get; set; }
 
-        public bool MustExist
-        {
-            get;
-            set;
-        }
-    }
+		public bool MustExist { get; set; }
+	}
 }

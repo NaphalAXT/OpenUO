@@ -7,245 +7,237 @@
  *   (at your option) any later version.
  *
  ***************************************************************************/
- #endregion
+#endregion
 
+#region References
 using System;
 using System.Collections.Generic;
+#endregion
 
 namespace OpenUO.Ultima.Network
 {
-    public class SendQueue
-    {
-        private const int PendingCap = 2048 * 1024;
+	public class SendQueue
+	{
+		private const int PendingCap = 2048 * 1024;
 
-        private static int _coalesceBufferSize = 512;
-        private static BufferPool _unusedBuffers = new BufferPool("Coalesced", 2048, _coalesceBufferSize);
+		private static int _coalesceBufferSize = 512;
+		private static BufferPool _unusedBuffers = new BufferPool("Coalesced", 2048, _coalesceBufferSize);
 
-        public static int CoalesceBufferSize
-        {
-            get { return _coalesceBufferSize; }
-            set
-            {
-                if (_coalesceBufferSize == value)
-                    return;
+		public static int CoalesceBufferSize
+		{
+			get { return _coalesceBufferSize; }
+			set
+			{
+				if (_coalesceBufferSize == value)
+				{
+					return;
+				}
 
-                if (_unusedBuffers != null)
-                    _unusedBuffers.Free();
+				if (_unusedBuffers != null)
+				{
+					_unusedBuffers.Free();
+				}
 
-                _coalesceBufferSize = value;
-                _unusedBuffers = new BufferPool("Coalesced", 2048, _coalesceBufferSize);
-            }
-        }
+				_coalesceBufferSize = value;
+				_unusedBuffers = new BufferPool("Coalesced", 2048, _coalesceBufferSize);
+			}
+		}
 
-        public static byte[] AcquireBuffer()
-        {
-            return _unusedBuffers.AcquireBuffer();
-        }
+		public static byte[] AcquireBuffer()
+		{
+			return _unusedBuffers.AcquireBuffer();
+		}
 
-        public static void ReleaseBuffer(byte[] buffer)
-        {
-            if (buffer != null && buffer.Length == _coalesceBufferSize)
-            {
-                _unusedBuffers.ReleaseBuffer(buffer);
-            }
-        }
+		public static void ReleaseBuffer(byte[] buffer)
+		{
+			if (buffer != null && buffer.Length == _coalesceBufferSize)
+			{
+				_unusedBuffers.ReleaseBuffer(buffer);
+			}
+		}
 
-        private readonly Queue<Gram> _pending;
-        private Gram _buffered;
+		private readonly Queue<Gram> _pending;
+		private Gram _buffered;
 
-        public bool IsFlushReady
-        {
-            get { return (_pending.Count == 0 && _buffered != null); }
-        }
+		public bool IsFlushReady { get { return (_pending.Count == 0 && _buffered != null); } }
 
-        public bool IsEmpty
-        {
-            get { return (_pending.Count == 0 && _buffered == null); }
-        }
+		public bool IsEmpty { get { return (_pending.Count == 0 && _buffered == null); } }
 
-        public SendQueue()
-        {
-            _pending = new Queue<Gram>();
-        }
+		public SendQueue()
+		{
+			_pending = new Queue<Gram>();
+		}
 
-        public Gram CheckFlushReady()
-        {
-            Gram gram = null;
+		public Gram CheckFlushReady()
+		{
+			Gram gram = null;
 
-            if (_pending.Count == 0 && _buffered != null)
-            {
-                gram = _buffered;
+			if (_pending.Count == 0 && _buffered != null)
+			{
+				gram = _buffered;
 
-                _pending.Enqueue(_buffered);
-                _buffered = null;
-            }
+				_pending.Enqueue(_buffered);
+				_buffered = null;
+			}
 
-            return gram;
-        }
+			return gram;
+		}
 
-        public Gram Dequeue()
-        {
-            Gram gram = null;
+		public Gram Dequeue()
+		{
+			Gram gram = null;
 
-            if (_pending.Count > 0)
-            {
-                _pending.Dequeue().Release();
+			if (_pending.Count > 0)
+			{
+				_pending.Dequeue().Release();
 
-                if (_pending.Count > 0)
-                {
-                    gram = _pending.Peek();
-                }
-            }
+				if (_pending.Count > 0)
+				{
+					gram = _pending.Peek();
+				}
+			}
 
-            return gram;
-        }
+			return gram;
+		}
 
-        public Gram Enqueue(byte[] buffer, int length)
-        {
-            return Enqueue(buffer, 0, length);
-        }
+		public Gram Enqueue(byte[] buffer, int length)
+		{
+			return Enqueue(buffer, 0, length);
+		}
 
-        public Gram Enqueue(byte[] buffer, int offset, int length)
-        {
-            if (buffer == null)
-            {
-                throw new ArgumentNullException("buffer");
-            }
+		public Gram Enqueue(byte[] buffer, int offset, int length)
+		{
+			if (buffer == null)
+			{
+				throw new ArgumentNullException("buffer");
+			}
 
-            if (!(offset >= 0 && offset < buffer.Length))
-            {
-                throw new ArgumentOutOfRangeException("offset", "Offset must be greater than or equal to zero and less than the size of the buffer.");
-            }
+			if (!(offset >= 0 && offset < buffer.Length))
+			{
+				throw new ArgumentOutOfRangeException(
+					"offset", "Offset must be greater than or equal to zero and less than the size of the buffer.");
+			}
 
-            if (length < 0 || length > buffer.Length)
-            {
-                throw new ArgumentOutOfRangeException("length", "Length cannot be less than zero or greater than the size of the buffer.");
-            }
+			if (length < 0 || length > buffer.Length)
+			{
+				throw new ArgumentOutOfRangeException(
+					"length", "Length cannot be less than zero or greater than the size of the buffer.");
+			}
 
-            if ((buffer.Length - offset) < length)
-            {
-                throw new ArgumentException("Offset and length do not point to a valid segment within the buffer.");
-            }
+			if ((buffer.Length - offset) < length)
+			{
+				throw new ArgumentException("Offset and length do not point to a valid segment within the buffer.");
+			}
 
-            int existingBytes = (_pending.Count * _coalesceBufferSize) + (_buffered == null ? 0 : _buffered.Length);
+			int existingBytes = (_pending.Count * _coalesceBufferSize) + (_buffered == null ? 0 : _buffered.Length);
 
-            if ((existingBytes + length) > PendingCap)
-            {
-                throw new CapacityExceededException();
-            }
+			if ((existingBytes + length) > PendingCap)
+			{
+				throw new CapacityExceededException();
+			}
 
-            Gram gram = null;
+			Gram gram = null;
 
-            while (length > 0)
-            {
-                if (_buffered == null)
-                {
-                    // nothing yet buffered
-                    _buffered = Gram.Acquire();
-                }
+			while (length > 0)
+			{
+				if (_buffered == null)
+				{
+					// nothing yet buffered
+					_buffered = Gram.Acquire();
+				}
 
-                int bytesWritten = _buffered.Write(buffer, offset, length);
+				int bytesWritten = _buffered.Write(buffer, offset, length);
 
-                offset += bytesWritten;
-                length -= bytesWritten;
+				offset += bytesWritten;
+				length -= bytesWritten;
 
-                // If it is Server it'll check the IsFull, if it is not then we'll expect that they are a ClientNetState Send
-                if (_buffered.IsFull)
-                {
-                    if (_pending.Count == 0)
-                    {
-                        gram = _buffered;
-                    }
+				// If it is Server it'll check the IsFull, if it is not then we'll expect that they are a ClientNetState Send
+				if (_buffered.IsFull)
+				{
+					if (_pending.Count == 0)
+					{
+						gram = _buffered;
+					}
 
-                    _pending.Enqueue(_buffered);
-                    _buffered = null;
-                }
-            }
+					_pending.Enqueue(_buffered);
+					_buffered = null;
+				}
+			}
 
-            return gram;
-        }
+			return gram;
+		}
 
-        public void Clear()
-        {
-            if (_buffered != null)
-            {
-                _buffered.Release();
-                _buffered = null;
-            }
+		public void Clear()
+		{
+			if (_buffered != null)
+			{
+				_buffered.Release();
+				_buffered = null;
+			}
 
-            while (_pending.Count > 0)
-            {
-                _pending.Dequeue().Release();
-            }
-        }
-        public class Gram
-        {
-            private static readonly Stack<Gram> _pool = new Stack<Gram>();
+			while (_pending.Count > 0)
+			{
+				_pending.Dequeue().Release();
+			}
+		}
 
-            public static Gram Acquire()
-            {
-                lock (_pool)
-                {
-                    Gram gram = _pool.Count > 0 ? _pool.Pop() : new Gram();
+		public class Gram
+		{
+			private static readonly Stack<Gram> _pool = new Stack<Gram>();
 
-                    gram._buffer = AcquireBuffer();
-                    gram._length = 0;
+			public static Gram Acquire()
+			{
+				lock (_pool)
+				{
+					Gram gram = _pool.Count > 0 ? _pool.Pop() : new Gram();
 
-                    return gram;
-                }
-            }
+					gram._buffer = AcquireBuffer();
+					gram._length = 0;
 
-            private byte[] _buffer;
-            private int _length;
+					return gram;
+				}
+			}
 
-            public byte[] Buffer
-            {
-                get { return _buffer; }
-            }
+			private byte[] _buffer;
+			private int _length;
 
-            public int Length
-            {
-                get { return _length; }
-            }
+			public byte[] Buffer { get { return _buffer; } }
 
-            public int Available
-            {
-                get { return (_buffer.Length - _length); }
-            }
+			public int Length { get { return _length; } }
 
-            public bool IsFull
-            {
-                get { return (_length == _buffer.Length); }
-            }
+			public int Available { get { return (_buffer.Length - _length); } }
 
-            private Gram()
-            {
-            }
+			public bool IsFull { get { return (_length == _buffer.Length); } }
 
-            public int Write(byte[] buffer, int offset, int length)
-            {
-                int write = Math.Min(length, Available);
+			private Gram()
+			{ }
 
-                System.Buffer.BlockCopy(buffer, offset, _buffer, _length, write);
+			public int Write(byte[] buffer, int offset, int length)
+			{
+				int write = Math.Min(length, Available);
 
-                _length += write;
+				System.Buffer.BlockCopy(buffer, offset, _buffer, _length, write);
 
-                return write;
-            }
+				_length += write;
 
-            public void Release()
-            {
-                lock (_pool)
-                {
-                    _pool.Push(this);
-                    ReleaseBuffer(_buffer);
-                }
-            }
-        }
-    }
+				return write;
+			}
 
-    public sealed class CapacityExceededException : Exception
-    {
-        public CapacityExceededException() : base("Too much data pending.") { }
-    }
+			public void Release()
+			{
+				lock (_pool)
+				{
+					_pool.Push(this);
+					ReleaseBuffer(_buffer);
+				}
+			}
+		}
+	}
+
+	public sealed class CapacityExceededException : Exception
+	{
+		public CapacityExceededException()
+			: base("Too much data pending.")
+		{ }
+	}
 }

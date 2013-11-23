@@ -1,5 +1,4 @@
 ﻿#region License Header
-
 // /***************************************************************************
 //  *   Copyright (c) 2011 OpenUO Software Team.
 //  *   All Right Reserved.
@@ -11,159 +10,156 @@
 //  *   the Free Software Foundation; either version 3 of the License, or
 //  *   (at your option) any later version.
 //  ***************************************************************************/
-
 #endregion
 
-#region Usings
-
+#region References
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-
 #endregion
 
 namespace OpenUO.Ultima.Adapters
 {
-    public class SkillStorageAdapter : StorageAdapterBase, ISkillStorageAdapter<Skill>
-    {
-        private SkillCategory[] _categories;
-        private int[] _categoryLookup;
-        private Skill[] _skills;
+	public class SkillStorageAdapter : StorageAdapterBase, ISkillStorageAdapter<Skill>
+	{
+		private SkillCategory[] _categories;
+		private int[] _categoryLookup;
+		private Skill[] _skills;
 
-        public override int Length
-        {
-            get
-            {
-                if (!IsInitialized)
-                {
-                    Initialize();
-                }
+		public override int Length
+		{
+			get
+			{
+				if (!IsInitialized)
+				{
+					Initialize();
+				}
 
-                return _skills.Length;
-            }
-        }
+				return _skills.Length;
+			}
+		}
 
-        public override void Initialize()
-        {
-            base.Initialize();
+		public override void Initialize()
+		{
+			base.Initialize();
 
-            InstallLocation install = Install;
+			InstallLocation install = Install;
 
-            ReadCategories(install);
-            ReadSkills(install);
-        }
+			ReadCategories(install);
+			ReadSkills(install);
+		}
 
-        public Skill GetSkill(int index)
-        {
-            if (index < _skills.Length)
-            {
-                return _skills[index];
-            }
+		public Skill GetSkill(int index)
+		{
+			if (index < _skills.Length)
+			{
+				return _skills[index];
+			}
 
-            return null;
-        }
+			return null;
+		}
 
-        private void ReadCategories(InstallLocation install)
-        {
-            List<SkillCategory> categories = new List<SkillCategory>();
+		private void ReadCategories(InstallLocation install)
+		{
+			var categories = new List<SkillCategory>();
 
-            string grpPath = install.GetPath("skillgrp.mul");
+			string grpPath = install.GetPath("skillgrp.mul");
 
-            if (grpPath == null)
-            {
-                _categories = categories.ToArray();
-                return;
-            }
+			if (grpPath == null)
+			{
+				_categories = categories.ToArray();
+				return;
+			}
 
-            using (FileStream stream = new FileStream(grpPath, FileMode.Open, FileAccess.Read, FileShare.Read))
-            {
-                BinaryReader bin = new BinaryReader(stream);
+			using (FileStream stream = new FileStream(grpPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+			{
+				BinaryReader bin = new BinaryReader(stream);
 
-                int categoryCount = bin.ReadInt32();
+				int categoryCount = bin.ReadInt32();
 
-                categories.Add(new SkillCategory(new SkillCategoryData(-17, 0, "Misc.")));
+				categories.Add(new SkillCategory(new SkillCategoryData(-17, 0, "Misc.")));
 
-                for (int i = 1; i < categoryCount; i++)
-                {
-                    BinaryReader nameReader = new BinaryReader(stream);
-                    StringBuilder nameBuilder = new StringBuilder();
-                    byte[] nameBuffer = bin.ReadBytes(17);
+				for (int i = 1; i < categoryCount; i++)
+				{
+					BinaryReader nameReader = new BinaryReader(stream);
+					StringBuilder nameBuilder = new StringBuilder();
+					var nameBuffer = bin.ReadBytes(17);
 
-                    for (int j = 0; j < 17; j++)
-                    {
-                        char ch = (char)nameBuffer[j];
+					for (int j = 0; j < 17; j++)
+					{
+						char ch = (char)nameBuffer[j];
 
-                        if (char.IsLetterOrDigit(ch) || char.IsWhiteSpace(ch) || char.IsPunctuation(ch))
-                        {
-                            nameBuilder.Append(ch);
-                        }
-                    }
+						if (char.IsLetterOrDigit(ch) || char.IsWhiteSpace(ch) || char.IsPunctuation(ch))
+						{
+							nameBuilder.Append(ch);
+						}
+					}
 
-                    string name = nameBuilder.ToString();
-                    long fileIndex = stream.Position - name.Length;
-                    categories.Add(new SkillCategory(new SkillCategoryData(fileIndex, i, name)));
-                }
+					string name = nameBuilder.ToString();
+					long fileIndex = stream.Position - name.Length;
+					categories.Add(new SkillCategory(new SkillCategoryData(fileIndex, i, name)));
+				}
 
-                _categoryLookup = new int[(stream.Length - stream.Position) / 4];
+				_categoryLookup = new int[(stream.Length - stream.Position) / 4];
 
-                for (int i = 0; i < _categoryLookup.Length; i++)
-                {
-                    _categoryLookup[i] = bin.ReadInt32();
-                }
-            }
+				for (int i = 0; i < _categoryLookup.Length; i++)
+				{
+					_categoryLookup[i] = bin.ReadInt32();
+				}
+			}
 
-            _categories = categories.ToArray();
-        }
+			_categories = categories.ToArray();
+		}
 
-        private void ReadSkills(InstallLocation install)
-        {
-            FileIndexBase fileIndex = install.CreateFileIndex("skills.idx", "skills.mul");
+		private void ReadSkills(InstallLocation install)
+		{
+			FileIndexBase fileIndex = install.CreateFileIndex("skills.idx", "skills.mul");
 
-            _skills = new Skill[fileIndex.Length];
+			_skills = new Skill[fileIndex.Length];
 
-            for (int i = 0; i < _skills.Length; i++)
-            {
-                Skill skill = ReadSkill(fileIndex, i);
+			for (int i = 0; i < _skills.Length; i++)
+			{
+				Skill skill = ReadSkill(fileIndex, i);
 
-                _skills[i] = skill;
-            }
-        }
+				_skills[i] = skill;
+			}
+		}
 
-        private Skill ReadSkill(FileIndexBase fileIndex, int index)
-        {
-            int length, extra;
-            Stream stream = fileIndex.Seek(index, out length, out extra);
+		private Skill ReadSkill(FileIndexBase fileIndex, int index)
+		{
+			int length, extra;
+			Stream stream = fileIndex.Seek(index, out length, out extra);
 
-            if (stream == null)
-            {
-                return null;
-            }
+			if (stream == null)
+			{
+				return null;
+			}
 
-            BinaryReader bin = new BinaryReader(stream);
-            int nameLength = length - 2;
+			BinaryReader bin = new BinaryReader(stream);
+			int nameLength = length - 2;
 
-            byte useBtn = bin.ReadByte();
-            byte[] nameBuffer = new byte[nameLength];
-            bin.Read(nameBuffer, 0, nameLength);
-            byte unk = bin.ReadByte();
+			byte useBtn = bin.ReadByte();
+			var nameBuffer = new byte[nameLength];
+			bin.Read(nameBuffer, 0, nameLength);
+			byte unk = bin.ReadByte();
 
-            StringBuilder sb = new StringBuilder(nameBuffer.Length);
+			StringBuilder sb = new StringBuilder(nameBuffer.Length);
 
-            for (int i = 0; i < nameBuffer.Length; i++)
-            {
-                sb.Append((char)nameBuffer[i]);
-            }
+			for (int i = 0; i < nameBuffer.Length; i++)
+			{
+				sb.Append((char)nameBuffer[i]);
+			}
 
-            SkillCategory category = _categories[0];
+			SkillCategory category = _categories[0];
 
-            if (index < _categoryLookup.Length)
-            {
-                category = _categories[_categoryLookup[index]];
-            }
+			if (index < _categoryLookup.Length)
+			{
+				category = _categories[_categoryLookup[index]];
+			}
 
-            Skill skill = new Skill(new SkillData(index, sb.ToString(), useBtn > 0, extra, unk, category));
+			Skill skill = new Skill(new SkillData(index, sb.ToString(), useBtn > 0, extra, unk, category));
 
-            return skill;
-        }
-    }
+			return skill;
+		}
+	}
 }

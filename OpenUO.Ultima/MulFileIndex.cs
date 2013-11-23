@@ -1,5 +1,4 @@
 #region License Header
-
 // /***************************************************************************
 //  *   Copyright (c) 2011 OpenUO Software Team.
 //  *   All Right Reserved.
@@ -11,69 +10,63 @@
 //  *   the Free Software Foundation; either version 3 of the License, or
 //  *   (at your option) any later version.
 //  ***************************************************************************/
-
 #endregion
 
-#region Usings
-
+#region References
 using System.Collections.Generic;
 using System.IO;
-
 #endregion
 
 namespace OpenUO.Ultima
 {
-    public class MulFileIndex : FileIndexBase
-    {
-        private readonly string _indexPath;
+	public class MulFileIndex : FileIndexBase
+	{
+		private readonly string _indexPath;
 
-        public MulFileIndex(string idxFile, string mulFile)
-            : base(mulFile)
-        {
-            _indexPath = idxFile;
-        }
+		public MulFileIndex(string idxFile, string mulFile)
+			: base(mulFile)
+		{
+			_indexPath = idxFile;
+		}
 
-        public override bool FilesExist
-        {
-            get { return File.Exists(_indexPath) && base.FilesExist; }
-        }
+		public override bool FilesExist { get { return File.Exists(_indexPath) && base.FilesExist; } }
 
-        protected override FileIndexEntry[] ReadEntries()
-        {
-            List<FileIndexEntry> entries = new List<FileIndexEntry>();
+		protected override FileIndexEntry[] ReadEntries()
+		{
+			var entries = new List<FileIndexEntry>();
 
-            int length = (int)((new FileInfo(_indexPath).Length / 3) / 4);
+			int length = (int)((new FileInfo(_indexPath).Length / 3) / 4);
 
-            using (FileStream index = new FileStream(_indexPath, FileMode.Open, FileAccess.Read, FileShare.Read))
-            {
-                BinaryReader bin = new BinaryReader(index);
+			using (FileStream index = new FileStream(_indexPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+			{
+				BinaryReader bin = new BinaryReader(index);
 
-                int count = (int)(index.Length / 12);
+				int count = (int)(index.Length / 12);
 
-                for (int i = 0; i < count && i < length; ++i)
-                {
-                    FileIndexEntry entry = new FileIndexEntry {
-                        Lookup = bin.ReadInt32(),
-                        Length = bin.ReadInt32(),
-                        Extra = bin.ReadInt32(),
-                    };
+				for (int i = 0; i < count && i < length; ++i)
+				{
+					FileIndexEntry entry = new FileIndexEntry {
+						Lookup = bin.ReadInt32(),
+						Length = bin.ReadInt32(),
+						Extra = bin.ReadInt32(),
+					};
 
-                    entries.Add(entry);
-                }
+					entries.Add(entry);
+				}
 
-                for (int i = count; i < length; ++i)
-                {
-                    FileIndexEntry entry = new FileIndexEntry {
-                        Lookup = -1,
-                        Length = -1,
-                        Extra = -1,
-                    };
+				for (int i = count; i < length; ++i)
+				{
+					FileIndexEntry entry = new FileIndexEntry {
+						Lookup = -1,
+						Length = -1,
+						Extra = -1,
+					};
 
-                    entries.Add(entry);
-                }
-            }
+					entries.Add(entry);
+				}
+			}
 
-            return entries.ToArray();
-        }
-    }
+			return entries.ToArray();
+		}
+	}
 }

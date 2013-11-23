@@ -1,5 +1,4 @@
 ﻿#region License Header
-
 // /***************************************************************************
 //  *   Copyright (c) 2011 OpenUO Software Team.
 //  *   All Right Reserved.
@@ -11,22 +10,19 @@
 //  *   the Free Software Foundation; either version 3 of the License, or
 //  *   (at your option) any later version.
 //  ***************************************************************************/
-
 #endregion
 
-#region Usings
-
+#region References
 using System;
-
 #endregion
 
 namespace OpenUO.Core
 {
-    public static class TypeExtensions
-    {
-        public static bool IsNullableType(this Type type)
-        {
-            return (type.IsGenericType && type.GetGenericTypeDefinition().Equals(typeof (Nullable<>)));
-        }
-    }
+	public static class TypeExtensions
+	{
+		public static bool IsNullableType(this Type type)
+		{
+			return (type.IsGenericType && type.GetGenericTypeDefinition().Equals(typeof(Nullable<>)));
+		}
+	}
 }

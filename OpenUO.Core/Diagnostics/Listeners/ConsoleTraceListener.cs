@@ -1,5 +1,4 @@
 ﻿#region License Header
-
 // /***************************************************************************
 //  *   Copyright (c) 2011 OpenUO Software Team.
 //  *   All Right Reserved.
@@ -11,42 +10,39 @@
 //  *   the Free Software Foundation; either version 3 of the License, or
 //  *   (at your option) any later version.
 //  ***************************************************************************/
-
 #endregion
 
-#region Usings
-
+#region References
 using System;
-
 #endregion
 
 namespace OpenUO.Core.Diagnostics
 {
-    public sealed class ConsoleTraceListener : TraceListener
-    {
-        protected override void OnTraceReceived(TraceMessage message)
-        {
-            ConsoleColor color = ConsoleColor.Gray;
+	public sealed class ConsoleTraceListener : TraceListener
+	{
+		protected override void OnTraceReceived(TraceMessage message)
+		{
+			ConsoleColor color = ConsoleColor.Gray;
 
-            switch (message.Type)
-            {
-                case TraceLevels.Info:
-                    color = ConsoleColor.White;
-                    break;
-                case TraceLevels.Warning:
-                    color = ConsoleColor.Yellow;
-                    break;
-                case TraceLevels.Error:
-                case TraceLevels.Fatal:
-                    color = ConsoleColor.Red;
-                    break;
-                default:
-                    break;
-            }
+			switch (message.Type)
+			{
+				case TraceLevels.Info:
+					color = ConsoleColor.White;
+					break;
+				case TraceLevels.Warning:
+					color = ConsoleColor.Yellow;
+					break;
+				case TraceLevels.Error:
+				case TraceLevels.Fatal:
+					color = ConsoleColor.Red;
+					break;
+				default:
+					break;
+			}
 
-            ConsoleHelper.PushColor(color);
-            Console.WriteLine(message);
-            ConsoleHelper.PopColor();
-        }
-    }
+			ConsoleHelper.PushColor(color);
+			Console.WriteLine(message);
+			ConsoleHelper.PopColor();
+		}
+	}
 }

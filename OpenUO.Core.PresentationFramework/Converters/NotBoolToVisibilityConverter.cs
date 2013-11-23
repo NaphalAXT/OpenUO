@@ -17,32 +17,35 @@
  ********************************************************/
 #endregion
 
+#region References
 using System;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
+#endregion
 
 namespace OpenUO.Core.PresentationFramework.Converters
 {
-    public class NotBoolToVisibilityConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            if (value is bool)
-            {
-                return (bool)value ? Visibility.Collapsed : Visibility.Visible;
-            }
+	public class NotBoolToVisibilityConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			if (value is bool)
+			{
+				return (bool)value ? Visibility.Collapsed : Visibility.Visible;
+			}
 
-            return Visibility.Collapsed;
-        }
+			return Visibility.Collapsed;
+		}
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            if (value is Visibility)
-            {
-                return (Visibility)value == Visibility.Collapsed;
-            }
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			if (value is Visibility)
+			{
+				return (Visibility)value == Visibility.Collapsed;
+			}
 
-            return false;
-        }
-    }
+			return false;
+		}
+	}
 }

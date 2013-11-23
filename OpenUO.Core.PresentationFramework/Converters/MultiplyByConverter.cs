@@ -17,29 +17,34 @@
  ********************************************************/
 #endregion
 
+#region References
 using System;
+using System.Globalization;
 using System.Windows.Data;
+#endregion
 
 namespace OpenUO.Core.PresentationFramework.Converters
 {
-    public sealed class MultiplyByConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            if (value == null || parameter == null)
-                return 0;
+	public sealed class MultiplyByConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			if (value == null || parameter == null)
+			{
+				return 0;
+			}
 
-            double a, b;
+			double a, b;
 
-            double.TryParse(value.ToString(), out a);
-            double.TryParse(parameter.ToString(), out b);
+			double.TryParse(value.ToString(), out a);
+			double.TryParse(parameter.ToString(), out b);
 
-            return a * b;
-        }
+			return a * b;
+		}
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            return null;
-        }
-    }
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			return null;
+		}
+	}
 }

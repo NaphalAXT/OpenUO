@@ -1,5 +1,4 @@
 ﻿#region License Header
-
 // /***************************************************************************
 //  *   Copyright (c) 2011 OpenUO Software Team.
 //  *   All Right Reserved.
@@ -11,195 +10,186 @@
 //  *   the Free Software Foundation; either version 3 of the License, or
 //  *   (at your option) any later version.
 //  ***************************************************************************/
-
 #endregion
 
-#region Usings
-
+#region References
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
+
 using OpenUO.Core.Diagnostics;
 using OpenUO.Core.IO;
-
 #endregion
 
 namespace OpenUO.Core.Configuration
 {
-    public class ConfigFile
-    {
-        private static readonly object _syncRoot = new object();
+	public class ConfigFile
+	{
+		private static readonly object _syncRoot = new object();
 
-        private readonly string _filename;
-        private readonly Dictionary<string, Dictionary<string, string>> _sections;
+		private readonly string _filename;
+		private readonly Dictionary<string, Dictionary<string, string>> _sections;
 
-        public ConfigFile(string filename)
-        {
-            _filename = filename;
-            _sections = new Dictionary<string, Dictionary<string, string>>();
+		public ConfigFile(string filename)
+		{
+			_filename = filename;
+			_sections = new Dictionary<string, Dictionary<string, string>>();
 
-            Reload();
-        }
+			Reload();
+		}
 
-        public bool Exists
-        {
-            get { return File.Exists(_filename); }
-        }
+		public bool Exists { get { return File.Exists(_filename); } }
 
-        private void LoadSettings()
-        {
-            Tracer.Info("Loading configuration...");
+		private void LoadSettings()
+		{
+			Tracer.Info("Loading configuration...");
 
-            _sections.Clear();
+			_sections.Clear();
 
-            try
-            {
-                lock (_syncRoot)
-                {
-                    if (!File.Exists(_filename))
-                    {
-                        return;
-                    }
+			try
+			{
+				lock (_syncRoot)
+				{
+					if (!File.Exists(_filename))
+					{
+						return;
+					}
 
-                    using (Stream stream = File.Open(_filename, FileMode.Open))
-                    {
-                        XDocument document = XDocument.Load(stream);
-                        
-                        foreach (XElement section in document.Root.Descendants("section"))
-                        {
-                            try
-                            {
-                                Dictionary<string, string> sectionTable = new Dictionary<string, string>();
-                                _sections.Add(section.Attribute("name").Value, sectionTable);
+					using (Stream stream = File.Open(_filename, FileMode.Open))
+					{
+						XDocument document = XDocument.Load(stream);
 
-                                foreach (XElement element in section.DescendantNodes())
-                                {
-                                    try
-                                    {
-                                        sectionTable.Add(
-                                            element.Attribute("name").Value,
-                                            element.Attribute("value").Value);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        Tracer.Error(e);
-                                    }
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                Tracer.Error(e);
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Tracer.Error(e);
-            }
-        }
+						foreach (XElement section in document.Root.Descendants("section"))
+						{
+							try
+							{
+								var sectionTable = new Dictionary<string, string>();
+								_sections.Add(section.Attribute("name").Value, sectionTable);
 
-        private void SaveSettings()
-        {
-            try
-            {
-                XmlWriterSettings settings = new XmlWriterSettings {
-                    CheckCharacters = false,
-                    CloseOutput = true,
-                    Encoding = Encoding.UTF8,
-                    Indent = true,
-                    NewLineHandling = NewLineHandling.Entitize
-                };
+								foreach (XElement element in section.DescendantNodes())
+								{
+									try
+									{
+										sectionTable.Add(element.Attribute("name").Value, element.Attribute("value").Value);
+									}
+									catch (Exception e)
+									{
+										Tracer.Error(e);
+									}
+								}
+							}
+							catch (Exception e)
+							{
+								Tracer.Error(e);
+							}
+						}
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				Tracer.Error(e);
+			}
+		}
 
-                XDocument document = new XDocument(settings);
-                document.Add(new XElement("configuration"));
+		private void SaveSettings()
+		{
+			try
+			{
+				XmlWriterSettings settings = new XmlWriterSettings {
+					CheckCharacters = false,
+					CloseOutput = true,
+					Encoding = Encoding.UTF8,
+					Indent = true,
+					NewLineHandling = NewLineHandling.Entitize
+				};
 
-                XElement configuration = document.Element("configuration");
+				XDocument document = new XDocument(settings);
+				document.Add(new XElement("configuration"));
 
-                foreach (var section in _sections)
-                {
-                    XElement xSection = new XElement("section", new XAttribute("name", section.Key));
+				XElement configuration = document.Element("configuration");
 
-                    foreach (var setting in section.Value)
-                    {
-                        xSection.Add(
-                            new XElement(
-                                "setting",
-                                new XAttribute("name", setting.Key),
-                                new XAttribute("value", setting.Value)));
-                    }
+				foreach (var section in _sections)
+				{
+					XElement xSection = new XElement("section", new XAttribute("name", section.Key));
 
-                    configuration.Add(xSection);
-                }
+					foreach (var setting in section.Value)
+					{
+						xSection.Add(new XElement("setting", new XAttribute("name", setting.Key), new XAttribute("value", setting.Value)));
+					}
 
-                lock (_syncRoot)
-                {
-                    string directory = Path.GetDirectoryName(_filename);
+					configuration.Add(xSection);
+				}
 
-                    if (!string.IsNullOrEmpty(directory))
-                    {
-                        FileSystemHelper.EnsureDirectoryExists(directory);
-                    }
+				lock (_syncRoot)
+				{
+					string directory = Path.GetDirectoryName(_filename);
 
-                    using (Stream stream = File.Open(_filename, FileMode.Create))
-                        document.Save(stream);
-                }
-            }
-            catch (Exception e)
-            {
-                Tracer.Error(e);
-            }
-        }
+					if (!string.IsNullOrEmpty(directory))
+					{
+						FileSystemHelper.EnsureDirectoryExists(directory);
+					}
 
-        public void SetValue<T>(string section, string key, T value)
-        {
-            Dictionary<string, string> sectionTable;
+					using (Stream stream = File.Open(_filename, FileMode.Create))
+					{
+						document.Save(stream);
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				Tracer.Error(e);
+			}
+		}
 
-            if (!_sections.TryGetValue(section, out sectionTable))
-            {
-                sectionTable = new Dictionary<string, string>();
-                _sections.Add(section, sectionTable);
-            }
+		public void SetValue<T>(string section, string key, T value)
+		{
+			Dictionary<string, string> sectionTable;
 
-            if (sectionTable.ContainsKey(key))
-            {
-                sectionTable[key] = value.ToString();
-            }
-            else
-            {
-                sectionTable.Add(key, value.ConvertTo<string>());
-            }
+			if (!_sections.TryGetValue(section, out sectionTable))
+			{
+				sectionTable = new Dictionary<string, string>();
+				_sections.Add(section, sectionTable);
+			}
 
-            SaveSettings();
-        }
+			if (sectionTable.ContainsKey(key))
+			{
+				sectionTable[key] = value.ToString();
+			}
+			else
+			{
+				sectionTable.Add(key, value.ConvertTo<string>());
+			}
 
-        public T GetValue<T>(string section, string key)
-        {
-            return GetValue(section, key, default(T));
-        }
+			SaveSettings();
+		}
 
-        public T GetValue<T>(string section, string key, T defaultValue)
-        {
-            if (!_sections.ContainsKey(section))
-            {
-                return defaultValue;
-            }
+		public T GetValue<T>(string section, string key)
+		{
+			return GetValue(section, key, default(T));
+		}
 
-            Dictionary<string, string> sectionTable = _sections[section];
+		public T GetValue<T>(string section, string key, T defaultValue)
+		{
+			if (!_sections.ContainsKey(section))
+			{
+				return defaultValue;
+			}
 
-            return !sectionTable.ContainsKey(key) ? defaultValue : sectionTable[key].ConvertTo<T>();
-        }
+			var sectionTable = _sections[section];
 
-        public void Reload()
-        {
-            if (File.Exists(_filename))
-            {
-                LoadSettings();
-            }
-        }
-    }
+			return !sectionTable.ContainsKey(key) ? defaultValue : sectionTable[key].ConvertTo<T>();
+		}
+
+		public void Reload()
+		{
+			if (File.Exists(_filename))
+			{
+				LoadSettings();
+			}
+		}
+	}
 }
