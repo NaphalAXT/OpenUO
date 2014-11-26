@@ -21,23 +21,23 @@ namespace OpenUO.Ultima
 {
 	public class MulFileIndex : FileIndexBase
 	{
-		private readonly string _indexPath;
+		private readonly string _IndexPath;
 
 		public MulFileIndex(string idxFile, string mulFile)
 			: base(mulFile)
 		{
-			_indexPath = idxFile;
+			_IndexPath = idxFile;
 		}
 
-		public override bool FilesExist { get { return File.Exists(_indexPath) && base.FilesExist; } }
+		public override bool FilesExist { get { return File.Exists(_IndexPath) && base.FilesExist; } }
 
 		protected override FileIndexEntry[] ReadEntries()
 		{
 			var entries = new List<FileIndexEntry>();
 
-			int length = (int)((new FileInfo(_indexPath).Length / 3) / 4);
+			int length = (int)((new FileInfo(_IndexPath).Length / 3) / 4);
 
-			using (FileStream index = new FileStream(_indexPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+			using (FileStream index = new FileStream(_IndexPath, FileMode.Open, FileAccess.Read, FileShare.Read))
 			{
 				BinaryReader bin = new BinaryReader(index);
 
@@ -48,7 +48,7 @@ namespace OpenUO.Ultima
 					FileIndexEntry entry = new FileIndexEntry {
 						Lookup = bin.ReadInt32(),
 						Length = bin.ReadInt32(),
-						Extra = bin.ReadInt32(),
+						Extra = bin.ReadInt32()
 					};
 
 					entries.Add(entry);

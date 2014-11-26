@@ -30,9 +30,9 @@ namespace OpenUO.Ultima
 	[TypeConverter(typeof(InstallLocationTypeConverter))]
 	public class InstallLocation
 	{
-		private static readonly Version _convertedToUOPVersion = new Version("7.0.24.0");
+		private static readonly Version _UOPVersion = new Version("7.0.24.0");
 
-		private Version _version;
+		private Version _Version;
 
 		public InstallLocation(string directory)
 		{
@@ -44,14 +44,14 @@ namespace OpenUO.Ultima
 		{
 			get
 			{
-				if (_version == null)
+				if (_Version == null)
 				{
 					string clientExe = GetPath("client.exe");
 
 					if (File.Exists(clientExe))
 					{
 						FileVersionInfo fileVersionInfo = GetClientVersion();
-						_version = new Version(
+						_Version = new Version(
 							fileVersionInfo.FileMajorPart,
 							fileVersionInfo.FileMinorPart,
 							fileVersionInfo.FileBuildPart,
@@ -59,18 +59,18 @@ namespace OpenUO.Ultima
 					}
 					else
 					{
-						_version = new Version("0.0.0.0");
+						_Version = new Version("0.0.0.0");
 					}
 				}
 
-				return _version;
+				return _Version;
 			}
 		}
 
 		[XmlAttribute("directory")]
 		public string Directory { get; private set; }
 
-		public bool IsUOPFormat { get { return Version >= _convertedToUOPVersion; } }
+		public bool IsUOPFormat { get { return Version >= _UOPVersion; } }
 
 		public FileIndexBase CreateFileIndex(string uopFile, int length, bool hasExtra, string extension)
 		{
@@ -163,7 +163,7 @@ namespace OpenUO.Ultima
 
 			if (!File.Exists(path))
 			{
-				Tracer.Warn("{0} does not exists.", path);
+				Tracer.Warn("{0} does not exist.", path);
 			}
 
 			return path;

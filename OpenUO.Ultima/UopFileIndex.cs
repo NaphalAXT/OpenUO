@@ -27,14 +27,14 @@ namespace OpenUO.Ultima
 	{
 		public const int UOP_MAGIC_NUMBER = 0x50594D;
 
-		private readonly string _extension;
-		private readonly bool _hasExtra;
+		private readonly string _Extension;
+		private readonly bool _Extra;
 
-		public UopFileIndex(string uopPath, int length, bool hasExtra, string extension)
+		public UopFileIndex(string uopPath, int length, bool extra, string extension)
 			: base(uopPath, length)
 		{
-			_extension = extension;
-			_hasExtra = hasExtra;
+			_Extension = extension;
+			_Extra = extra;
 		}
 
 		protected override FileIndexEntry[] ReadEntries()
@@ -53,8 +53,8 @@ namespace OpenUO.Ultima
 			using (FileStream index = new FileStream(dataPath, FileMode.Open, FileAccess.Read, FileShare.Read))
 			{
 				FileInfo fi = new FileInfo(dataPath);
-				string uopPattern = Path.GetFileNameWithoutExtension(fi.Name).ToLowerInvariant();
-
+				string uopPattern = (Path.GetFileNameWithoutExtension(fi.Name) ?? String.Empty).ToLowerInvariant();
+				
 				using (BinaryReader br = new BinaryReader(index))
 				{
 					br.BaseStream.Seek(0, SeekOrigin.Begin);
@@ -67,13 +67,13 @@ namespace OpenUO.Ultima
 					br.ReadInt64(); // version + signature
 					long nextBlock = br.ReadInt64();
 					br.ReadInt32(); // block capacity
-					int count = br.ReadInt32();
+					/*int count =*/ br.ReadInt32();
 
 					var hashes = new Dictionary<ulong, int>();
 
 					for (int i = 0; i < length; i++)
 					{
-						string entryName = string.Format("build/{0}/{1:D8}{2}", uopPattern, i, _extension);
+						string entryName = string.Format("build/{0}/{1:D8}{2}", uopPattern, i, _Extension);
 						ulong hash = CreateHash(entryName);
 
 						if (!hashes.ContainsKey(hash))
@@ -107,33 +107,38 @@ namespace OpenUO.Ultima
 							}
 
 							int idx;
-							if (hashes.TryGetValue(hash, out idx))
+
+							if (!hashes.TryGetValue(hash, out idx))
 							{
-								if (idx < 0 || idx > entries.Length)
-								{
-									throw new IndexOutOfRangeException("hashes dictionary and files collection have different count of entries!");
-								}
-
-								entries[idx].Lookup = (int)(offset + headerLength);
-								entries[idx].Length = entryLength;
-
-								if (_hasExtra)
-								{
-									long curPos = br.BaseStream.Position;
-
-									br.BaseStream.Seek(offset + headerLength, SeekOrigin.Begin);
-
-									var extra = br.ReadBytes(8);
-
-									ushort extra1 = (ushort)((extra[3] << 24) | (extra[2] << 16) | (extra[1] << 8) | extra[0]);
-									ushort extra2 = (ushort)((extra[7] << 24) | (extra[6] << 16) | (extra[5] << 8) | extra[4]);
-
-									entries[idx].Lookup += 8;
-									entries[idx].Extra = extra1 << 16 | extra2;
-
-									br.BaseStream.Seek(curPos, SeekOrigin.Begin);
-								}
+								continue;
 							}
+
+							if (idx < 0 || idx > entries.Length)
+							{
+								throw new IndexOutOfRangeException("hashes dictionary and files collection have different count of entries!");
+							}
+
+							entries[idx].Lookup = (int)(offset + headerLength);
+							entries[idx].Length = entryLength;
+
+							if (!_Extra)
+							{
+								continue;
+							}
+
+							long curPos = br.BaseStream.Position;
+
+							br.BaseStream.Seek(offset + headerLength, SeekOrigin.Begin);
+
+							var extra = br.ReadBytes(8);
+
+							ushort extra1 = (ushort)((extra[3] << 24) | (extra[2] << 16) | (extra[1] << 8) | extra[0]);
+							ushort extra2 = (ushort)((extra[7] << 24) | (extra[6] << 16) | (extra[5] << 8) | extra[4]);
+
+							entries[idx].Lookup += 8;
+							entries[idx].Extra = extra1 << 16 | extra2;
+
+							br.BaseStream.Seek(curPos, SeekOrigin.Begin);
 						}
 					}
 					while (br.BaseStream.Seek(nextBlock, SeekOrigin.Begin) != 0);
@@ -145,12 +150,11 @@ namespace OpenUO.Ultima
 
 		public static ulong CreateHash(string s)
 		{
-			uint eax, ecx, edx, ebx, esi, edi;
+			uint eax = 0;
+			uint ecx, edx, esi, edi;
+			uint ebx = edi = esi = (uint)s.Length + 0xDEADBEEF;
 
-			eax = ecx = edx = ebx = esi = edi = 0;
-			ebx = edi = esi = (uint)s.Length + 0xDEADBEEF;
-
-			int i = 0;
+			int i;
 
 			for (i = 0; i + 12 < s.Length; i += 12)
 			{

@@ -36,6 +36,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenUO.Core.Net45", "OpenUO
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenUO.Core.PresentationFramework.Net45", "OpenUO.Core.PresentationFramework.Net45\OpenUO.Core.PresentationFramework.Net45.csproj", "{957F8375-0AA9-4F4D-ADCB-F3A083F92914}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notes", "Notes", "{E7BF655E-B02B-410B-9BB9-98A143ECCA56}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = OpenUO.vsmdi

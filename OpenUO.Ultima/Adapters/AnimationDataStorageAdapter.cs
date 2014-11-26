@@ -22,7 +22,7 @@ namespace OpenUO.Ultima.Adapters
 {
 	public class AnimationDataStorageAdapter : StorageAdapterBase, IAnimationDataStorageAdapter<AnimationData>
 	{
-		private AnimationData[] _animationData;
+		private AnimationData[] _AnimationData;
 
 		public override int Length
 		{
@@ -33,7 +33,7 @@ namespace OpenUO.Ultima.Adapters
 					Initialize();
 				}
 
-				return _animationData.Length;
+				return _AnimationData.Length;
 			}
 		}
 
@@ -70,14 +70,14 @@ namespace OpenUO.Ultima.Adapters
 				}
 			}
 
-			_animationData = animationData.ToArray();
+			_AnimationData = animationData.ToArray();
 		}
 
 		public AnimationData GetAnimationData(int index)
 		{
-			if (index < _animationData.Length)
+			if (index < _AnimationData.Length)
 			{
-				return _animationData[index];
+				return _AnimationData[index];
 			}
 
 			return AnimationData.Empty;

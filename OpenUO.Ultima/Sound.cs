@@ -22,44 +22,44 @@ namespace OpenUO.Ultima
 {
 	public class Sound : IDisposable
 	{
-		private readonly SoundPlayer _player;
+		private readonly SoundPlayer _Player;
 
 		public Sound(string name, Stream stream)
 		{
 			Name = name;
-			_player = new SoundPlayer(stream);
+			_Player = new SoundPlayer(stream);
 		}
 
 		public string Name { get; private set; }
 
 		public void Dispose()
 		{
-			if (_player == null)
+			if (_Player == null)
 			{
 				return;
 			}
 
-			_player.Dispose();
+			_Player.Dispose();
 		}
 
 		public void Play()
 		{
-			_player.Play();
+			_Player.Play();
 		}
 
 		public void PlayLooping()
 		{
-			_player.PlayLooping();
+			_Player.PlayLooping();
 		}
 
 		public void PlaySync()
 		{
-			_player.PlaySync();
+			_Player.PlaySync();
 		}
 
 		public void Stop()
 		{
-			_player.Stop();
+			_Player.Stop();
 		}
 	}
 }
